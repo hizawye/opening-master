@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-01-11
+
+### Changed
+- **Complete Tailwind CSS UI Redesign**: Removed all custom CSS variables and design tokens, simplified entire frontend to use clean Tailwind CSS classes
+  - Deleted `frontend/src/styles/design-tokens.css` entirely (123 lines removed)
+  - Simplified `frontend/src/index.css` from 442 lines to basic resets and Tailwind imports
+  - Redesigned all layout components: `Header`, `MobileNav`, `PageContainer`
+  - Redesigned all UI primitives: `Button`, `Card`, `Input`, `Modal`
+  - Redesigned all page components: `Dashboard`, `LoginPage`, `RegisterPage`
+  - Fixed remaining Card variant errors in `PracticeSession`, `PracticeSetup`, `RepertoireEditor`
+
+### Design System
+- **Colors**: Now using Tailwind's slate palette (slate-950, slate-900, slate-800, slate-700) with indigo-600 for primary actions
+- **Components**: Removed glassmorphism and complex gradients in favor of simple borders and clean backgrounds
+- **Styling**: All components now use direct Tailwind classes instead of CSS custom properties
+- **Net Result**: Reduced CSS by 891 lines, improved maintainability and consistency
+
+### Technical
+- Total changes: 15 files modified, 393 insertions(+), 1284 deletions(-)
+- Build successful with no TypeScript errors
+- All pages verified and responsive
+
 ## [0.3.1] - 2026-01-11
 
 ### Fixed

@@ -65,6 +65,12 @@
   - Chess-themed patterns and animations
   - 44px touch targets for mobile
   - Safe area inset support
+- [x] Tailwind CSS Simplification (v0.4.0):
+  - Removed all CSS custom properties and design-tokens.css
+  - Simplified entire frontend to clean Tailwind CSS classes
+  - Redesigned all components with slate color palette
+  - Reduced CSS by 891 lines for better maintainability
+  - All components now use direct Tailwind utilities
 
 ## MVP Features Complete
 - ✅ User authentication (email/password)

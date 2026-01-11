@@ -264,7 +264,7 @@ export default function PracticeSession() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="max-w-2xl mx-auto"
             >
-              <Card variant="glass" className="text-center py-12">
+              <Card className="text-center py-12">
                 {/* Trophy with glow effect */}
                 <motion.div
                   initial={{ scale: 0 }}
@@ -447,7 +447,7 @@ export default function PracticeSession() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8 pt-16 lg:pt-0">
                 {/* Chess Board */}
                 <div className="lg:col-span-2">
-                  <Card variant="glass" padding="none" className="overflow-hidden">
+                  <Card padding="none" className="overflow-hidden">
                     {/* Board container - edge to edge on mobile */}
                     <div className="p-2 sm:p-6 bg-gradient-to-b from-white/[0.02] to-transparent">
                       <div className="max-w-lg mx-auto relative">

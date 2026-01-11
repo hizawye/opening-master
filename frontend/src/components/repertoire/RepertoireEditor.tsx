@@ -150,7 +150,7 @@ export default function RepertoireEditor() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Chess Board */}
           <div className="lg:col-span-2">
-            <Card variant="glass" padding="none" className="overflow-hidden">
+            <Card padding="none" className="overflow-hidden">
               {/* Board container with subtle glow */}
               <div className="p-6 bg-gradient-to-b from-white/[0.02] to-transparent">
                 <div className="max-w-lg mx-auto relative">
@@ -241,7 +241,7 @@ export default function RepertoireEditor() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
               >
-                <Card variant="gradient" padding="sm">
+                <Card padding="sm">
                   <div className="flex items-center gap-2 mb-2">
                     <BookOpen className="h-5 w-5 text-indigo-400" />
                     <h3 className="font-medium text-[var(--text-primary)]">

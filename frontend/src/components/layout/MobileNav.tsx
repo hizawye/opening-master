@@ -26,16 +26,8 @@ export function MobileNav() {
   }
 
   return (
-    <nav
-      className={cn(
-        'fixed bottom-0 left-0 right-0 z-[var(--z-fixed)]',
-        'bg-[var(--bg-surface)]/95 backdrop-blur-xl',
-        'border-t border-white/5',
-        'pb-[env(safe-area-inset-bottom)]',
-        'lg:hidden' // Hide on desktop
-      )}
-    >
-      <div className="flex items-center justify-around h-[var(--mobile-nav-height)] px-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 border-t border-slate-800 pb-safe lg:hidden">
+      <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
           const isActive =
             item.to === '/'
@@ -48,22 +40,21 @@ export function MobileNav() {
               to={item.to}
               className={cn(
                 'relative flex flex-col items-center justify-center',
-                'w-16 h-14 rounded-2xl transition-all duration-200',
-                'touch-target',
+                'w-16 h-14 rounded-xl transition-colors',
                 isActive
-                  ? 'text-[var(--accent-400)]'
-                  : 'text-[var(--text-muted)] active:text-[var(--text-secondary)]'
+                  ? 'text-indigo-400'
+                  : 'text-slate-500 active:text-slate-400'
               )}
             >
-              {/* Active background glow */}
+              {/* Active background */}
               {isActive && (
                 <motion.div
                   layoutId="nav-active-bg"
                   className={cn(
-                    'absolute inset-0 rounded-2xl',
+                    'absolute inset-0 rounded-xl',
                     item.isPrimary
-                      ? 'bg-gradient-to-t from-indigo-600/20 to-indigo-500/10'
-                      : 'bg-white/5'
+                      ? 'bg-indigo-600/20'
+                      : 'bg-slate-800'
                   )}
                   transition={{ type: 'spring', duration: 0.5 }}
                 />
@@ -73,9 +64,9 @@ export function MobileNav() {
               {item.isPrimary ? (
                 <div
                   className={cn(
-                    'relative flex items-center justify-center w-12 h-12 rounded-xl transition-all',
+                    'relative flex items-center justify-center w-12 h-12 rounded-lg transition-all',
                     isActive
-                      ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-lg shadow-indigo-600/30'
+                      ? 'bg-indigo-600'
                       : 'bg-indigo-600/20'
                   )}
                 >
@@ -85,14 +76,6 @@ export function MobileNav() {
                       isActive ? 'text-white' : 'text-indigo-400'
                     )}
                   />
-                  {isActive && (
-                    <motion.div
-                      className="absolute inset-0 rounded-xl bg-white/20"
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1.1, opacity: 0 }}
-                      transition={{ duration: 0.6, repeat: Infinity }}
-                    />
-                  )}
                 </div>
               ) : (
                 <>
@@ -102,7 +85,7 @@ export function MobileNav() {
                       isActive && 'scale-110'
                     )}
                   />
-                  <span className="text-[10px] font-medium">{item.label}</span>
+                  <span className="text-[10px] font-medium relative z-10">{item.label}</span>
                 </>
               )}
 
@@ -111,7 +94,7 @@ export function MobileNav() {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-[var(--accent-400)]"
+                  className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-indigo-400"
                 />
               )}
             </NavLink>

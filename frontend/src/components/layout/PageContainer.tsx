@@ -6,9 +6,7 @@ export interface PageContainerProps {
   children: ReactNode;
   className?: string;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
-  /** Remove horizontal padding for edge-to-edge content (e.g., chessboard on mobile) */
   fullBleed?: boolean;
-  /** Add bottom padding for mobile navigation */
   withMobileNav?: boolean;
 }
 
@@ -38,7 +36,6 @@ export function PageContainer({
         'mx-auto py-6 sm:py-8',
         fullBleed ? 'px-0 sm:px-6 lg:px-8' : 'px-4 sm:px-6 lg:px-8',
         maxWidths[maxWidth],
-        // Add bottom padding for mobile nav on small screens
         withMobileNav && 'pb-24 lg:pb-8',
         className
       )}

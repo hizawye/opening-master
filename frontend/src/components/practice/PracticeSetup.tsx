@@ -202,7 +202,7 @@ export default function PracticeSetup() {
             </div>
 
             {/* Step Content */}
-            <Card variant="glass" className="overflow-hidden min-h-[350px] relative">
+            <Card className="overflow-hidden min-h-[350px] relative">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={currentStep}
