@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2026-01-11
+
+### Fixed
+- **Registration Bug**: Fixed issue where registration always showed "Email may already be in use" error regardless of actual error type
+  - Frontend now displays actual backend error messages instead of generic fallback
+  - Backend detects MongoDB duplicate key errors and returns proper "email already registered" message
+  - Added unique index on email field to prevent duplicate registrations at database level
+
+### Changed
+- Improved error handling in `RegisterPage.tsx` to parse and display backend error responses
+- `UserRepository.CreateIndexes()` now creates unique index on email field
+- `AuthHandler.Register()` now handles duplicate key errors with specific error messages
+
 ## [0.3.0] - Mobile-First UI Overhaul
 
 ### Added

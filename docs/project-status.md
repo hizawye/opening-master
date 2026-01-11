@@ -45,6 +45,7 @@
 
 ### Phase 7: Polish 🔄
 - [x] Basic error handling
+- [x] Registration error handling fix (v0.3.1)
 - [ ] Unit tests
 - [ ] E2E tests
 - [x] Responsive design (basic)
