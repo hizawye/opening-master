@@ -14,7 +14,6 @@ import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Spinner } from '../ui/Spinner';
-import { cn } from '../../utils/cn';
 
 export default function RepertoireEditor() {
   const { id } = useParams<{ id: string }>();
@@ -132,14 +131,14 @@ export default function RepertoireEditor() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
+      <div className="u-min-h-screen u-flex u-items-center u-justify-center" style={{ backgroundColor: '#0a0a0f' }}>
         <Spinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)]">
+    <div className="u-min-h-screen" style={{ backgroundColor: '#0a0a0f' }}>
       <Header
         title={repertoire?.name}
         subtitle={`${repertoire?.color === 'white' ? '♔ White' : '♚ Black'} Repertoire`}
@@ -147,17 +146,23 @@ export default function RepertoireEditor() {
       />
 
       <PageContainer>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="repertoire-editor" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
           {/* Chess Board */}
-          <div className="lg:col-span-2">
-            <Card padding="none" className="overflow-hidden">
+          <div style={{ gridColumn: 'span 1' }} className="u-lg-col-span-2">
+            <Card padding="none" style={{ overflow: 'hidden' }}>
               {/* Board container with subtle glow */}
-              <div className="p-6 bg-gradient-to-b from-white/[0.02] to-transparent">
-                <div className="max-w-lg mx-auto relative">
+              <div style={{ padding: '1.5rem', background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)' }}>
+                <div style={{ maxWidth: '32rem', margin: '0 auto', position: 'relative' }}>
                   {/* Glow effect behind board */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 blur-3xl -z-10" />
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to bottom right, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))',
+                    filter: 'blur(48px)',
+                    zIndex: -1,
+                  }} />
 
-                  <div className="rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                  <div style={{ borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
                     <Chessboard
                       options={{
                         position: fen,
@@ -171,13 +176,13 @@ export default function RepertoireEditor() {
               </div>
 
               {/* Controls */}
-              <div className="px-6 pb-4 flex justify-center gap-2">
+              <div style={{ padding: '0 1.5rem 1rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleUndo}
                   disabled={moveHistory.length === 0}
-                  leftIcon={<RotateCcw className="h-4 w-4" />}
+                  leftIcon={<RotateCcw style={{ width: '1rem', height: '1rem' }} />}
                 >
                   Undo
                 </Button>
@@ -185,7 +190,7 @@ export default function RepertoireEditor() {
                   variant="ghost"
                   size="sm"
                   onClick={handleReset}
-                  leftIcon={<RefreshCw className="h-4 w-4" />}
+                  leftIcon={<RefreshCw style={{ width: '1rem', height: '1rem' }} />}
                 >
                   Reset
                 </Button>
@@ -193,20 +198,20 @@ export default function RepertoireEditor() {
                   size="sm"
                   onClick={() => setShowAddOpening(true)}
                   disabled={moveHistory.length === 0}
-                  leftIcon={<Save className="h-4 w-4" />}
+                  leftIcon={<Save style={{ width: '1rem', height: '1rem' }} />}
                 >
                   Save Opening
                 </Button>
               </div>
 
               {/* Move history */}
-              <div className="border-t border-white/5 p-4 bg-[var(--bg-elevated)]/50">
-                <h3 className="text-sm font-medium text-[var(--text-tertiary)] mb-3">
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '1rem', backgroundColor: 'rgba(26, 26, 46, 0.5)' }}>
+                <h3 style={{ fontSize: '0.875rem', fontWeight: 500, color: 'rgba(255, 255, 255, 0.6)', marginBottom: '0.75rem' }}>
                   Current Line
                 </h3>
-                <div className="flex flex-wrap gap-1">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
                   {moveHistory.length === 0 ? (
-                    <span className="text-[var(--text-muted)] text-sm italic">
+                    <span style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.875rem', fontStyle: 'italic' }}>
                       Make moves on the board to build your repertoire
                     </span>
                   ) : (
@@ -215,14 +220,21 @@ export default function RepertoireEditor() {
                         key={index}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="inline-flex items-center"
+                        style={{ display: 'inline-flex', alignItems: 'center' }}
                       >
                         {index % 2 === 0 && (
-                          <span className="text-[var(--text-muted)] text-sm mr-1">
+                          <span style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.875rem', marginRight: '0.25rem' }}>
                             {Math.floor(index / 2) + 1}.
                           </span>
                         )}
-                        <span className="bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded text-sm font-mono">
+                        <span style={{
+                          backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                          color: '#00f0ff',
+                          padding: '0.125rem 0.5rem',
+                          borderRadius: '0.375rem',
+                          fontSize: '0.875rem',
+                          fontFamily: 'Share Tech Mono, monospace',
+                        }}>
                           {move}
                         </span>
                       </motion.span>
@@ -234,7 +246,7 @@ export default function RepertoireEditor() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-4">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {/* Opening Info */}
             {explorerData?.opening && (
               <motion.div
@@ -242,16 +254,24 @@ export default function RepertoireEditor() {
                 animate={{ opacity: 1, x: 0 }}
               >
                 <Card padding="sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="h-5 w-5 text-indigo-400" />
-                    <h3 className="font-medium text-[var(--text-primary)]">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <BookOpen style={{ width: '1.25rem', height: '1.25rem', color: '#00f0ff' }} />
+                    <h3 style={{ fontWeight: 500, color: 'white' }}>
                       Current Opening
                     </h3>
                   </div>
-                  <p className="text-[var(--text-secondary)]">
+                  <p style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                     {explorerData.opening.name}
                   </p>
-                  <span className="inline-block mt-2 px-2 py-1 bg-white/10 rounded text-xs text-[var(--text-secondary)]">
+                  <span style={{
+                    display: 'inline-block',
+                    marginTop: '0.5rem',
+                    padding: '0.25rem 0.5rem',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.8)',
+                  }}>
                     {explorerData.opening.eco}
                   </span>
                 </Card>
@@ -260,17 +280,17 @@ export default function RepertoireEditor() {
 
             {/* Book Moves */}
             <Card>
-              <div className="flex items-center gap-2 mb-4">
-                <Lightbulb className="h-5 w-5 text-yellow-400" />
-                <h3 className="font-medium text-[var(--text-primary)]">Book Moves</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <Lightbulb style={{ width: '1.25rem', height: '1.25rem', color: '#ffaa00' }} />
+                <h3 style={{ fontWeight: 500, color: 'white' }}>Book Moves</h3>
               </div>
 
               {explorerLoading ? (
-                <div className="flex justify-center py-4">
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
                   <Spinner size="sm" />
                 </div>
               ) : explorerData?.moves && explorerData.moves.length > 0 ? (
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {explorerData.moves.slice(0, 8).map((move, index) => {
                     const total = move.white + move.draws + move.black;
                     const whitePercent = (move.white / total) * 100;
@@ -283,33 +303,39 @@ export default function RepertoireEditor() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05 }}
                         onClick={() => handleBookMoveClick(move.san)}
-                        className="w-full group"
+                        style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
                       >
-                        <div className="p-3 rounded-xl bg-[var(--bg-elevated)] hover:bg-[var(--bg-overlay)] border border-transparent hover:border-indigo-500/30 transition-all">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-mono text-[var(--text-primary)] font-medium group-hover:text-indigo-400 transition-colors">
+                        <div style={{
+                          padding: '0.75rem',
+                          borderRadius: '1rem',
+                          backgroundColor: '#1a1a2e',
+                          border: '1px solid transparent',
+                          transition: 'all 0.2s',
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <span style={{ fontFamily: 'Share Tech Mono, monospace', color: 'white', fontWeight: 500 }}>
                               {move.san}
                             </span>
-                            <span className="text-xs text-[var(--text-muted)]">
+                            <span style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)' }}>
                               {total.toLocaleString()} games
                             </span>
                           </div>
                           {/* Win/Draw/Loss bar */}
-                          <div className="flex h-1.5 rounded-full overflow-hidden bg-[var(--bg-base)]">
+                          <div style={{ display: 'flex', height: '6px', borderRadius: '9999px', overflow: 'hidden', backgroundColor: '#0a0a0f' }}>
                             <motion.div
-                              className="bg-white"
+                              style={{ backgroundColor: 'white' }}
                               initial={{ width: 0 }}
                               animate={{ width: `${whitePercent}%` }}
                               transition={{ delay: 0.2 }}
                             />
                             <motion.div
-                              className="bg-gray-500"
+                              style={{ backgroundColor: 'gray' }}
                               initial={{ width: 0 }}
                               animate={{ width: `${drawPercent}%` }}
                               transition={{ delay: 0.3 }}
                             />
                             <motion.div
-                              className="bg-gray-800"
+                              style={{ backgroundColor: '#1a1a1a' }}
                               initial={{ width: 0 }}
                               animate={{ width: `${100 - whitePercent - drawPercent}%` }}
                               transition={{ delay: 0.4 }}
@@ -321,7 +347,7 @@ export default function RepertoireEditor() {
                   })}
                 </div>
               ) : (
-                <p className="text-[var(--text-muted)] text-sm">
+                <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.875rem' }}>
                   No book moves found for this position
                 </p>
               )}
@@ -329,32 +355,37 @@ export default function RepertoireEditor() {
 
             {/* Saved Openings */}
             <Card>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-medium text-[var(--text-primary)]">Saved Openings</h3>
-                <span className="text-sm text-[var(--text-muted)]">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <h3 style={{ fontWeight: 500, color: 'white' }}>Saved Openings</h3>
+                <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.6)' }}>
                   {repertoire?.openings?.length || 0}
                 </span>
               </div>
               {repertoire?.openings && repertoire.openings.length > 0 ? (
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {repertoire.openings.map((opening, index) => (
                     <button
                       key={opening.id || index}
                       onClick={() => setSelectedOpening(index)}
-                      className={cn(
-                        'w-full p-3 rounded-xl text-left transition-all',
-                        selectedOpening === index
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--bg-overlay)]'
-                      )}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        borderRadius: '1rem',
+                        textAlign: 'left',
+                        transition: 'all 0.2s',
+                        border: 'none',
+                        cursor: 'pointer',
+                        backgroundColor: selectedOpening === index ? '#00f0ff' : '#1a1a2e',
+                        color: selectedOpening === index ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                      }}
                     >
-                      <p className="font-medium">{opening.name}</p>
-                      <p className="text-xs opacity-75">{opening.eco || 'Custom'}</p>
+                      <p style={{ fontWeight: 500 }}>{opening.name}</p>
+                      <p style={{ fontSize: '0.75rem', opacity: 0.75 }}>{opening.eco || 'Custom'}</p>
                     </button>
                   ))}
                 </div>
               ) : (
-                <p className="text-[var(--text-muted)] text-sm">No openings saved yet</p>
+                <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.875rem' }}>No openings saved yet</p>
               )}
             </Card>
           </div>
@@ -376,22 +407,27 @@ export default function RepertoireEditor() {
             required
           />
 
-          <div className="mt-4 p-3 bg-[var(--bg-elevated)] rounded-xl">
-            <p className="text-sm text-[var(--text-secondary)]">
+          <div style={{
+            marginTop: '1rem',
+            padding: '0.75rem',
+            backgroundColor: '#1a1a2e',
+            borderRadius: '1rem',
+          }}>
+            <p style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.8)' }}>
               Moves: {moveHistory.join(' ')}
             </p>
           </div>
 
-          <div className="flex gap-3 mt-6">
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
             <Button
               type="button"
-              variant="secondary"
+              variant="neutral"
               onClick={() => setShowAddOpening(false)}
-              className="flex-1"
+              className="u-flex-1"
             >
               Cancel
             </Button>
-            <Button type="submit" isLoading={isSaving} className="flex-1">
+            <Button type="submit" isLoading={isSaving} className="u-flex-1">
               Save
             </Button>
           </div>

@@ -38,6 +38,23 @@ App
 │               └── PracticeSession
 ```
 
+### UI Component Library (DaisyUI + Custom Cyberpunk Theme)
+- **Core Components**: Button, Card, Input, Modal, Badge, Toast, Spinner, Skeleton
+- **Layout Components**: Header, PageContainer, MobileNav
+- **Chess Components**: AccuracyRing (radial-progress), MoveFeedback, Chessboard wrapper
+- **Theme**: Custom "cyberpunk" theme using Tailwind CSS 4 @theme directive
+  - Colors: oklch() format (cyan primary, pink error, green success, purple accent)
+  - Typography: Orbitron (display), Rajdhani (body), Share Tech Mono (monospace)
+  - Effects: Grid backgrounds, scanlines, multi-layer glows, glassmorphism
+  - Animations: stat-glow, electric-flicker, circuit-pulse, shimmer
+
+### Styling Architecture
+- **Framework**: Tailwind CSS 4 + DaisyUI component library
+- **Theme Definition**: `frontend/src/styles/index.css` with @theme directive
+- **Custom Utilities**: `.text-electric`, `.cyber-corners`, `.glow-*` classes
+- **Animations**: `frontend/src/styles/animations.css` - cyberpunk keyframes
+- **Approach**: DaisyUI base classes + custom cyberpunk styling + Framer Motion
+
 ### State Management
 - **AuthContext**: User authentication state
 - **ChessContext**: Game state (chess.js)

@@ -4,7 +4,7 @@
 Chess Openings Trainer - A web app for practicing chess openings with AI opponent and move analysis.
 
 ## Tech Stack
-- **Frontend**: React + TypeScript, Vite, Tailwind CSS
+- **Frontend**: React + TypeScript, Vite, Plain CSS (BEM)
 - **Backend**: Go (Gin framework)
 - **Database**: MongoDB
 - **Chess Engine**: Stockfish WASM

@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { cn } from '../../utils/cn';
 import type { MoveCategory } from '../../types/practice';
 
 export interface BadgeProps {
@@ -8,24 +7,16 @@ export interface BadgeProps {
   children: React.ReactNode;
   className?: string;
   glow?: boolean;
+  pulse?: boolean;
 }
 
-const moveCategoryStyles: Record<MoveCategory, string> = {
-  book: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  best: 'bg-green-500/20 text-green-300 border-green-500/30',
-  good: 'bg-lime-500/20 text-lime-300 border-lime-500/30',
-  inaccuracy: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
-  mistake: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
-  blunder: 'bg-red-500/20 text-red-300 border-red-500/30',
-};
-
-const moveCategoryGlow: Record<MoveCategory, string> = {
-  book: 'shadow-[0_0_10px_rgba(168,85,247,0.3)]',
-  best: 'shadow-[0_0_10px_rgba(34,197,94,0.3)]',
-  good: 'shadow-[0_0_10px_rgba(132,204,22,0.3)]',
-  inaccuracy: 'shadow-[0_0_10px_rgba(234,179,8,0.3)]',
-  mistake: 'shadow-[0_0_10px_rgba(249,115,22,0.3)]',
-  blunder: 'shadow-[0_0_10px_rgba(239,68,68,0.3)]',
+const categoryToDaisyUIMap: Record<MoveCategory, string> = {
+  book: 'badge-accent',      // purple
+  best: 'badge-success',     // green
+  good: 'badge-info',        // cyan
+  inaccuracy: 'badge-warning', // yellow
+  mistake: 'badge-warning',  // orange/yellow
+  blunder: 'badge-error',    // pink
 };
 
 export function Badge({
@@ -34,22 +25,30 @@ export function Badge({
   children,
   className,
   glow = false,
+  pulse = false,
 }: BadgeProps) {
-  const baseStyles =
-    'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border';
+  const badgeClass = variant === 'move' && category
+    ? categoryToDaisyUIMap[category]
+    : 'badge-neutral';
 
-  const variantStyles =
-    variant === 'move' && category
-      ? moveCategoryStyles[category]
-      : 'bg-white/10 text-[var(--text-secondary)] border-white/10';
-
-  const glowStyles = glow && variant === 'move' && category ? moveCategoryGlow[category] : '';
+  const glowClass = glow && variant === 'move' && category ? {
+    book: 'glow-purple',
+    best: 'glow-success',
+    good: 'glow-primary',
+    inaccuracy: 'glow-warning',
+    mistake: 'glow-warning',
+    blunder: 'glow-danger',
+  }[category] : '';
 
   return (
     <motion.span
-      initial={{ scale: 0.9, opacity: 0 }}
+      initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className={cn(baseStyles, variantStyles, glowStyles, className)}
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      className={`badge ${badgeClass} ${glowClass} font-display text-xs uppercase tracking-wider ${className || ''}`}
+      style={{
+        animation: pulse ? 'glow-pulse 2s ease-in-out infinite' : undefined,
+      }}
     >
       {children}
     </motion.span>

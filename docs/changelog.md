@@ -2,6 +2,77 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-01-12
+
+### Changed
+- **Complete DaisyUI Migration with Cyberpunk Theme**: Migrated entire UI from plain CSS (BEM) to DaisyUI component library while establishing distinctive cyberpunk/neon aesthetic
+  - Reinstalled Tailwind CSS 4 as DaisyUI dependency
+  - Created custom "cyberpunk" theme using @theme directive with oklch() color format
+  - Typography system: Orbitron (display), Rajdhani (body), Share Tech Mono (monospace)
+  - Grid background with scanline effects and multi-layer glow shadows
+  - Glassmorphism with backdrop-blur on all cards and modals
+  - Custom utility classes: `.text-electric`, `.cyber-corners`, `.glow-primary`, etc.
+  - Cyberpunk animations: `stat-glow`, `electric-flicker`, `circuit-pulse`, `shimmer`
+  - All 21 components migrated to use DaisyUI classes with cyberpunk styling
+  - Comprehensive CSS variable cleanup across all components (27 instances replaced)
+
+### Added
+- `frontend/src/styles/index.css` - Cyberpunk theme definition and grid/scanline effects (200+ lines)
+- `frontend/src/styles/animations.css` - Cyberpunk-specific keyframe animations
+- Google Fonts integration (Orbitron, Rajdhani, Share Tech Mono)
+
+### Removed
+- `frontend/src/index.css` - Replaced with new styles directory structure
+- `frontend/src/utils/cn.ts` - No longer needed with DaisyUI
+- All BEM CSS classes across components
+- All CSS custom properties (var(--*)) replaced with explicit values
+
+### Dependencies
+- Added: `daisyui@5.5.14`, `tailwindcss@latest`, `@tailwindcss/vite@latest`
+- Re-added Tailwind after v0.5.0 removal (required for DaisyUI)
+
+### Design System
+- **Colors**:
+  - Primary (Cyan): #00f0ff / oklch(85% 0.18 200)
+  - Error (Pink): #ff006e / oklch(65% 0.25 10)
+  - Success (Green): #39ff14 / oklch(85% 0.25 130)
+  - Accent (Purple): #bf00ff / oklch(65% 0.3 300)
+  - Backgrounds: #0a0a0f (base), #1a1a2e (elevated)
+- **Effects**: Multi-layer glows, glassmorphism, grid patterns, scanlines
+- **Typography**: Distinctive font choices replacing generic system fonts
+
+### Technical
+- Total changes: 28 files, 1310 insertions, 1343 deletions
+- Build verified with no errors
+- All pages styled consistently with cyberpunk aesthetic
+- Responsive design maintained across mobile/tablet/desktop
+
+## [0.5.0] - 2026-01-12
+
+### Changed
+- **Removed Tailwind CSS**: Complete migration from Tailwind CSS to plain CSS with BEM naming convention
+  - Created new CSS architecture: `styles/variables.css`, `reset.css`, `utilities.css`, `animations.css`
+  - Component CSS files in `styles/components/` directory
+  - Design tokens defined as CSS custom properties (colors, spacing, typography, shadows)
+  - All 21 components migrated (517 className instances)
+
+### Removed
+- `@tailwindcss/forms` dependency
+- `@tailwindcss/vite` dependency
+- `tailwindcss` dependency
+- `tailwind-merge` dependency
+- `clsx` dependency
+- `autoprefixer` dependency
+- `postcss` dependency
+- `src/utils/cn.ts` utility file
+
+### Technical
+- Dependencies reduced from 16 to 9 runtime dependencies
+- CSS now uses BEM naming (`.button`, `.button--primary`, `.button__icon`)
+- Utility classes use `u-` prefix (e.g., `u-flex`, `u-min-h-screen`)
+- Build verified working with no errors
+- Preserved cyberpunk/neon design aesthetic
+
 ## [0.4.0] - 2026-01-11
 
 ### Changed

@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, AlertTriangle, BookOpen, Star, Zap } from 'lucide-react';
-import { cn } from '../../utils/cn';
 import type { MoveCategory } from '../../types/practice';
 
 export interface MoveFeedbackProps {
@@ -12,53 +11,46 @@ export interface MoveFeedbackProps {
 }
 
 const categoryConfig: Record<MoveCategory, {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ style?: React.CSSProperties }>;
   label: string;
   color: string;
-  bgClass: string;
-  animation: string;
+  bgGradient: string;
 }> = {
   book: {
     icon: BookOpen,
     label: 'Book Move',
-    color: 'var(--book-move)',
-    bgClass: 'bg-gradient-book',
-    animation: 'animate-book-glow',
+    color: '#00f0ff',
+    bgGradient: 'linear-gradient(to right, rgba(0, 240, 255, 0.1), rgba(191, 0, 255, 0.1))',
   },
   best: {
     icon: Star,
     label: 'Best Move',
-    color: 'var(--best-move)',
-    bgClass: 'bg-gradient-best',
-    animation: 'animate-success-pulse',
+    color: '#39ff14',
+    bgGradient: 'linear-gradient(to right, rgba(57, 255, 20, 0.1), rgba(57, 255, 20, 0.05))',
   },
   good: {
     icon: CheckCircle,
     label: 'Good Move',
-    color: 'var(--good-move)',
-    bgClass: 'bg-gradient-good',
-    animation: 'animate-success-pulse',
+    color: '#39ff14',
+    bgGradient: 'linear-gradient(to right, rgba(57, 255, 20, 0.08), rgba(57, 255, 20, 0.03))',
   },
   inaccuracy: {
     icon: AlertTriangle,
     label: 'Inaccuracy',
-    color: 'var(--inaccuracy)',
-    bgClass: 'bg-gradient-inaccuracy',
-    animation: '',
+    color: '#ffaa00',
+    bgGradient: 'linear-gradient(to right, rgba(255, 170, 0, 0.1), rgba(255, 170, 0, 0.05))',
   },
   mistake: {
     icon: XCircle,
     label: 'Mistake',
-    color: 'var(--mistake)',
-    bgClass: 'bg-gradient-mistake',
-    animation: 'animate-error-shake',
+    color: '#fe6e00',
+    bgGradient: 'linear-gradient(to right, rgba(254, 110, 0, 0.1), rgba(254, 110, 0, 0.05))',
   },
   blunder: {
     icon: Zap,
     label: 'Blunder',
-    color: 'var(--blunder)',
-    bgClass: 'bg-gradient-blunder',
-    animation: 'animate-error-shake',
+    color: '#ff006e',
+    bgGradient: 'linear-gradient(to right, rgba(255, 0, 110, 0.1), rgba(255, 0, 110, 0.05))',
   },
 };
 
@@ -81,43 +73,52 @@ export function MoveFeedback({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          className={cn(
-            'rounded-xl border transition-all',
-            config.bgClass,
-            config.animation,
-            compact ? 'p-3' : 'p-4'
-          )}
-          style={{ borderColor: `${config.color}40` }}
+          style={{
+            borderRadius: '1rem',
+            border: `1px solid ${config.color}40`,
+            padding: compact ? '0.75rem' : '1rem',
+            background: config.bgGradient,
+            transition: 'all 0.2s',
+            position: 'relative',
+          }}
         >
-          <div className={cn(
-            'flex items-center gap-3',
-            compact ? 'flex-row' : 'sm:flex-row flex-col sm:items-center items-start'
-          )}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            flexDirection: compact ? 'row' : undefined,
+          }}>
             {/* Icon with animation */}
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', damping: 10, stiffness: 200, delay: 0.1 }}
-              className={cn(
-                'flex items-center justify-center rounded-xl',
-                compact ? 'w-10 h-10' : 'w-12 h-12',
-                isPositive ? 'bg-white/10' : 'bg-black/20'
-              )}
-              style={{ color: config.color }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '1rem',
+                width: compact ? '2.5rem' : '3rem',
+                height: compact ? '2.5rem' : '3rem',
+                backgroundColor: isPositive ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.2)',
+                color: config.color,
+              }}
             >
-              <Icon className={compact ? 'h-5 w-5' : 'h-6 w-6'} />
+              <Icon style={{ width: compact ? '1.25rem' : '1.5rem', height: compact ? '1.25rem' : '1.5rem' }} />
             </motion.div>
 
             {/* Move and category info */}
-            <div className="flex-1 min-w-0">
+            <div style={{ flex: 1, minWidth: 0 }}>
               <motion.p
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.15 }}
-                className={cn(
-                  'font-mono font-semibold text-[var(--text-primary)]',
-                  compact ? 'text-base' : 'text-lg'
-                )}
+                style={{
+                  fontFamily: 'Share Tech Mono, monospace',
+                  fontWeight: 600,
+                  color: 'white',
+                  fontSize: compact ? '1rem' : '1.125rem',
+                }}
               >
                 {move}
               </motion.p>
@@ -125,8 +126,11 @@ export function MoveFeedback({
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}
-                style={{ color: config.color }}
+                style={{
+                  fontWeight: 500,
+                  fontSize: compact ? '0.75rem' : '0.875rem',
+                  color: config.color,
+                }}
               >
                 {config.label}
               </motion.p>
@@ -139,11 +143,17 @@ export function MoveFeedback({
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.25 }}
                 onClick={onRequestExplanation}
-                className={cn(
-                  'px-3 py-1.5 rounded-lg text-sm font-medium',
-                  'bg-white/10 hover:bg-white/15 transition-colors',
-                  'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                )}
+                style={{
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '0.75rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
               >
                 Why?
               </motion.button>
@@ -153,7 +163,13 @@ export function MoveFeedback({
           {/* Decorative elements for positive moves */}
           {isPositive && !compact && (
             <motion.div
-              className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                overflow: 'hidden',
+                borderRadius: '1rem',
+              }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -162,12 +178,28 @@ export function MoveFeedback({
               {category === 'best' && (
                 <>
                   <motion.div
-                    className="absolute top-2 right-4 w-1 h-1 bg-yellow-400 rounded-full"
+                    style={{
+                      position: 'absolute',
+                      top: '0.5rem',
+                      right: '1rem',
+                      width: '4px',
+                      height: '4px',
+                      backgroundColor: '#fbbf24',
+                      borderRadius: '50%',
+                    }}
                     animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   />
                   <motion.div
-                    className="absolute top-4 right-8 w-0.5 h-0.5 bg-yellow-300 rounded-full"
+                    style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '2rem',
+                      width: '2px',
+                      height: '2px',
+                      backgroundColor: '#fcd34d',
+                      borderRadius: '50%',
+                    }}
                     animate={{ scale: [1, 2, 1], opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                   />
@@ -193,14 +225,20 @@ export function MoveFeedbackPill({
 
   return (
     <div
-      className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium"
       style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.25rem',
+        padding: '0.25rem 0.5rem',
+        borderRadius: '9999px',
+        fontSize: '0.75rem',
+        fontWeight: 500,
         backgroundColor: `${config.color}20`,
         color: config.color,
       }}
     >
       <span>{count}</span>
-      <span className="opacity-75">{config.label.split(' ')[0]}</span>
+      <span style={{ opacity: 0.75 }}>{config.label.split(' ')[0]}</span>
     </div>
   );
 }

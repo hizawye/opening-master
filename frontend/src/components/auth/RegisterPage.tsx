@@ -5,8 +5,6 @@ import { Crown, Mail, Lock, User, ArrowRight, AlertCircle, Check } from 'lucide-
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { Card } from '../ui/Card';
-import { cn } from '../../utils/cn';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -53,162 +51,155 @@ export default function RegisterPage() {
   const passwordValid = password.length >= 8;
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-slate-950">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        <Card>
-          {/* Logo */}
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 rounded-xl bg-indigo-600 flex items-center justify-center mx-auto shadow-lg mb-4">
-              <Crown className="h-8 w-8 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-50">
-              Create Account
-            </h2>
-            <p className="mt-1.5 text-sm text-slate-500">
-              Start mastering chess openings today
-            </p>
-          </div>
+    <div className="min-h-screen bg-[#0a0a0f] relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0f] via-[#1a1a2e] to-[#0a0a0f]" />
+        <div className="absolute -top-20 -right-20 w-[500px] h-[500px] bg-accent/30 rounded-full blur-[100px]" />
+        <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-primary/30 rounded-full blur-[100px]" />
+      </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg p-3 text-sm flex items-center gap-3"
-              >
-                <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                  <AlertCircle className="h-4 w-4" />
-                </div>
-                {error}
-              </motion.div>
-            )}
-
-            <Input
-              label="Username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              leftIcon={<User className="h-5 w-5" />}
-              placeholder="ChessMaster2000"
-              autoComplete="username"
-              required
-            />
-
-            <Input
-              label="Email address"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              leftIcon={<Mail className="h-5 w-5" />}
-              placeholder="you@example.com"
-              autoComplete="email"
-              required
-            />
-
-            <div>
-              <Input
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                leftIcon={<Lock className="h-5 w-5" />}
-                placeholder="••••••••"
-                autoComplete="new-password"
-                required
-              />
-              {/* Password requirements */}
-              {password.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="mt-2"
-                >
-                  <div
-                    className={cn(
-                      'flex items-center gap-2 text-xs transition-colors',
-                      passwordValid ? 'text-green-400' : 'text-slate-500'
-                    )}
-                  >
-                    <Check className={cn('h-3 w-3', passwordValid ? 'opacity-100' : 'opacity-30')} />
-                    At least 8 characters
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
-            <div>
-              <Input
-                label="Confirm Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                leftIcon={<Lock className="h-5 w-5" />}
-                placeholder="••••••••"
-                autoComplete="new-password"
-                required
-              />
-              {confirmPassword.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className={cn(
-                    'mt-2 flex items-center gap-2 text-xs',
-                    passwordsMatch ? 'text-green-400' : 'text-red-400'
-                  )}
-                >
-                  {passwordsMatch ? (
-                    <>
-                      <Check className="h-3 w-3" />
-                      Passwords match
-                    </>
-                  ) : (
-                    <>
-                      <AlertCircle className="h-3 w-3" />
-                      Passwords do not match
-                    </>
-                  )}
-                </motion.div>
-              )}
-            </div>
-
-            <Button
-              type="submit"
-              isLoading={isLoading}
-              className="w-full mt-2"
-              size="lg"
-              rightIcon={<ArrowRight className="h-5 w-5" />}
-            >
-              Create account
-            </Button>
-          </form>
-
-          <div className="mt-6 pt-5 border-t border-slate-700">
-            <p className="text-center text-sm text-slate-500">
-              Already have an account?{' '}
-              <Link
-                to="/login"
-                className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
-              >
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </Card>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-center mt-5 text-xs text-slate-600"
+      <div className="relative flex items-center justify-center p-6 min-h-screen">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-lg"
         >
-          Join thousands of players improving their openings
-        </motion.p>
-      </motion.div>
+          <div className="card bg-[#1a1a2e]/90 shadow-2xl border border-accent/20 backdrop-blur-xl">
+            <div className="card-body p-8">
+              {/* Logo */}
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg glow-purple">
+                  <Crown className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="font-display text-3xl font-bold text-white mb-2">Join Arena</h2>
+                <p className="font-display text-sm text-white/60 uppercase tracking-wider">Begin your path to mastery</p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="alert alert-error"
+                  >
+                    <AlertCircle className="w-5 h-5" />
+                    <span>{error}</span>
+                  </motion.div>
+                )}
+
+                <Input
+                  label="Username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  leftIcon={<User className="w-5 h-5" />}
+                  placeholder="ChessMaster2000"
+                  autoComplete="username"
+                  required
+                />
+
+                <Input
+                  label="Email Address"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  leftIcon={<Mail className="w-5 h-5" />}
+                  placeholder="player@example.com"
+                  autoComplete="email"
+                  required
+                />
+
+                <div>
+                  <Input
+                    label="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    leftIcon={<Lock className="w-5 h-5" />}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    required
+                  />
+                  {password.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className={`mt-3 flex items-center gap-2 font-display text-xs font-bold uppercase tracking-wider ${
+                        passwordValid ? 'text-success' : 'text-base-content/60'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        passwordValid
+                          ? 'border-success bg-success/20'
+                          : 'border-base-content/60'
+                      }`}>
+                        {passwordValid && <Check className="w-2.5 h-2.5" />}
+                      </div>
+                      8+ Characters
+                    </motion.div>
+                  )}
+                </div>
+
+                <div>
+                  <Input
+                    label="Confirm Password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    leftIcon={<Lock className="w-5 h-5" />}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    required
+                  />
+                  {confirmPassword.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className={`mt-3 flex items-center gap-2 font-display text-xs font-bold uppercase tracking-wider ${
+                        passwordsMatch ? 'text-success' : 'text-error'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        passwordsMatch
+                          ? 'border-success bg-success/20'
+                          : 'border-error bg-error/20'
+                      }`}>
+                        {passwordsMatch ? (
+                          <Check className="w-2.5 h-2.5" />
+                        ) : (
+                          <AlertCircle className="w-2.5 h-2.5" />
+                        )}
+                      </div>
+                      {passwordsMatch ? 'Passwords Match' : "Passwords Don't Match"}
+                    </motion.div>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  isLoading={isLoading}
+                  className="w-full mt-2"
+                  size="lg"
+                  rightIcon={<ArrowRight className="w-5 h-5" />}
+                >
+                  {isLoading ? 'Creating Account...' : 'Join Now'}
+                </Button>
+              </form>
+
+              <div className="divider"></div>
+
+              <p className="text-center text-sm text-white/60">
+                Already training?{' '}
+                <Link to="/login" className="link link-primary font-semibold hover:text-primary">
+                  Sign In
+                </Link>
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

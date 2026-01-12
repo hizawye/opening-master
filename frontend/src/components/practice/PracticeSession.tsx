@@ -20,7 +20,6 @@ import { Modal } from '../ui/Modal';
 import { Spinner } from '../ui/Spinner';
 import { AccuracyRing } from '../ui/AccuracyRing';
 import { MoveFeedback } from './MoveFeedback';
-import { cn } from '../../utils/cn';
 
 interface MoveResult {
   move: string;
@@ -232,14 +231,14 @@ export default function PracticeSession() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
         <Spinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)]">
+    <div className="min-h-screen bg-[#0a0a0f]">
       <Header
         title="Practice Session"
         subtitle={repertoire?.name}
@@ -285,10 +284,10 @@ export default function PracticeSession() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
+                  <h2 className="text-3xl font-bold text-white mb-2">
                     Session Complete!
                   </h2>
-                  <p className="text-[var(--text-secondary)] mb-8">Here's how you did:</p>
+                  <p className="text-white/80 mb-8">Here's how you did:</p>
                 </motion.div>
 
                 {/* Stats Grid */}
@@ -299,35 +298,35 @@ export default function PracticeSession() {
                   className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8"
                 >
                   <motion.div variants={itemVariants}>
-                    <Card padding="sm" className="bg-[var(--bg-elevated)]">
-                      <p className="text-3xl font-bold text-[var(--text-primary)]">
+                    <Card padding="sm" className="bg-[#1a1a2e]/60">
+                      <p className="text-3xl font-bold text-white">
                         {session?.stats.total_moves || 0}
                       </p>
-                      <p className="text-sm text-[var(--text-muted)]">Total Moves</p>
+                      <p className="text-sm text-white/60">Total Moves</p>
                     </Card>
                   </motion.div>
                   <motion.div variants={itemVariants}>
-                    <Card padding="sm" className="bg-[var(--bg-elevated)]">
+                    <Card padding="sm" className="bg-[#1a1a2e]/60">
                       <p className="text-3xl font-bold" style={{ color: CATEGORY_COLORS.book }}>
                         {session?.stats.book_moves || 0}
                       </p>
-                      <p className="text-sm text-[var(--text-muted)]">Book Moves</p>
+                      <p className="text-sm text-white/60">Book Moves</p>
                     </Card>
                   </motion.div>
                   <motion.div variants={itemVariants}>
-                    <Card padding="sm" className="bg-[var(--bg-elevated)]">
+                    <Card padding="sm" className="bg-[#1a1a2e]/60">
                       <p className="text-3xl font-bold" style={{ color: CATEGORY_COLORS.best }}>
                         {(session?.stats.best_moves || 0) + (session?.stats.good_moves || 0)}
                       </p>
-                      <p className="text-sm text-[var(--text-muted)]">Good Moves</p>
+                      <p className="text-sm text-white/60">Good Moves</p>
                     </Card>
                   </motion.div>
                   <motion.div variants={itemVariants}>
-                    <Card padding="sm" className="bg-[var(--bg-elevated)]">
+                    <Card padding="sm" className="bg-[#1a1a2e]/60">
                       <p className="text-3xl font-bold" style={{ color: CATEGORY_COLORS.mistake }}>
                         {(session?.stats.mistakes || 0) + (session?.stats.blunders || 0)}
                       </p>
-                      <p className="text-sm text-[var(--text-muted)]">Mistakes</p>
+                      <p className="text-sm text-white/60">Mistakes</p>
                     </Card>
                   </motion.div>
                 </motion.div>
@@ -372,32 +371,44 @@ export default function PracticeSession() {
               className="relative"
             >
               {/* Mobile Stats Overlay - Fixed at top */}
-              <div className="lg:hidden fixed top-16 left-0 right-0 z-30 px-4 py-2">
+              <div className="u-hide-desktop" style={{ position: 'fixed', top: '4rem', left: 0, right: 0, zIndex: 30, padding: '1rem 1rem 0.5rem' }}>
                 <motion.button
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   onClick={() => setShowMobileStats(!showMobileStats)}
-                  className={cn(
-                    'w-full flex items-center justify-between px-4 py-3 rounded-xl',
-                    'bg-[var(--bg-surface)]/95 backdrop-blur-xl border border-white/10',
-                    'shadow-lg'
-                  )}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '1rem',
+                    backgroundColor: 'rgba(26, 26, 46, 0.95)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 10px 40px -10px rgba(0, 0, 0, 0.4)',
+                    cursor: 'pointer',
+                  }}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-[var(--text-muted)]">Moves</span>
-                      <span className="text-lg font-bold text-[var(--text-primary)]">{moveResults.length}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.6)' }}>Moves</span>
+                      <span style={{ fontSize: '1.125rem', fontWeight: 700, color: 'white' }}>{moveResults.length}</span>
                     </div>
-                    <div className="w-px h-6 bg-white/10" />
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-[var(--text-muted)]">Accuracy</span>
-                      <span className="text-lg font-bold text-indigo-400">{calculateAccuracy()}%</span>
+                    <div style={{ width: '1px', height: '1.5rem', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.6)' }}>Accuracy</span>
+                      <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#00f0ff' }}>{calculateAccuracy()}%</span>
                     </div>
                   </div>
-                  <ChevronUp className={cn(
-                    'h-5 w-5 text-[var(--text-muted)] transition-transform',
-                    showMobileStats && 'rotate-180'
-                  )} />
+                  <ChevronUp style={{
+                    width: '1.25rem',
+                    height: '1.25rem',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    transition: 'transform 0.2s',
+                    transform: showMobileStats ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }} />
                 </motion.button>
 
                 {/* Expandable Stats Panel */}
@@ -409,29 +420,29 @@ export default function PracticeSession() {
                       exit={{ opacity: 0, height: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="mt-2 p-4 rounded-xl bg-[var(--bg-surface)]/95 backdrop-blur-xl border border-white/10 shadow-lg">
+                      <div className="mt-2 p-4 rounded-xl bg-[#1a1a2e]/80/95 backdrop-blur-xl border border-white/10 shadow-lg">
                         <div className="grid grid-cols-4 gap-2 mb-3">
-                          <div className="text-center p-2 rounded-lg bg-[var(--bg-elevated)]">
-                            <p className="text-lg font-bold text-[var(--text-primary)]">{moveResults.length}</p>
-                            <p className="text-[10px] text-[var(--text-muted)]">Total</p>
+                          <div className="text-center p-2 rounded-lg bg-[#1a1a2e]/60">
+                            <p className="text-lg font-bold text-white">{moveResults.length}</p>
+                            <p className="text-[10px] text-white/60">Total</p>
                           </div>
-                          <div className="text-center p-2 rounded-lg bg-[var(--bg-elevated)]">
+                          <div className="text-center p-2 rounded-lg bg-[#1a1a2e]/60">
                             <p className="text-lg font-bold" style={{ color: CATEGORY_COLORS.book }}>
                               {moveResults.filter(r => r.category === 'book').length}
                             </p>
-                            <p className="text-[10px] text-[var(--text-muted)]">Book</p>
+                            <p className="text-[10px] text-white/60">Book</p>
                           </div>
-                          <div className="text-center p-2 rounded-lg bg-[var(--bg-elevated)]">
+                          <div className="text-center p-2 rounded-lg bg-[#1a1a2e]/60">
                             <p className="text-lg font-bold" style={{ color: CATEGORY_COLORS.best }}>
                               {moveResults.filter(r => r.category === 'best' || r.category === 'good').length}
                             </p>
-                            <p className="text-[10px] text-[var(--text-muted)]">Good</p>
+                            <p className="text-[10px] text-white/60">Good</p>
                           </div>
-                          <div className="text-center p-2 rounded-lg bg-[var(--bg-elevated)]">
+                          <div className="text-center p-2 rounded-lg bg-[#1a1a2e]/60">
                             <p className="text-lg font-bold" style={{ color: CATEGORY_COLORS.mistake }}>
                               {moveResults.filter(r => r.category === 'mistake' || r.category === 'blunder').length}
                             </p>
-                            <p className="text-[10px] text-[var(--text-muted)]">Errors</p>
+                            <p className="text-[10px] text-white/60">Errors</p>
                           </div>
                         </div>
                         <Button variant="secondary" size="sm" className="w-full" onClick={() => setShowMobileStats(false)}>
@@ -474,9 +485,9 @@ export default function PracticeSession() {
                               exit={{ opacity: 0 }}
                               className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center rounded-xl"
                             >
-                              <div className="bg-[var(--bg-surface)] px-4 py-3 rounded-xl flex items-center gap-3 shadow-xl">
+                              <div className="bg-[#1a1a2e]/80 px-4 py-3 rounded-xl flex items-center gap-3 shadow-xl">
                                 <Spinner size="sm" />
-                                <span className="text-[var(--text-primary)] font-medium">
+                                <span className="text-white font-medium">
                                   {aiThinking ? 'AI thinking...' : 'Analyzing...'}
                                 </span>
                               </div>
@@ -501,8 +512,8 @@ export default function PracticeSession() {
                           compact={false}
                         />
                       ) : (
-                        <div className="p-4 rounded-xl bg-[var(--bg-elevated)] border border-white/5 text-center">
-                          <p className="text-[var(--text-muted)] text-sm">Make your move to start</p>
+                        <div className="p-4 rounded-xl bg-[#1a1a2e]/60 border border-white/5 text-center">
+                          <p className="text-white/60 text-sm">Make your move to start</p>
                         </div>
                       )}
                     </div>
@@ -537,8 +548,8 @@ export default function PracticeSession() {
                   <Card>
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-medium text-[var(--text-primary)] mb-1">Session Accuracy</h3>
-                        <p className="text-sm text-[var(--text-muted)]">{moveResults.length} moves played</p>
+                        <h3 className="font-medium text-white mb-1">Session Accuracy</h3>
+                        <p className="text-sm text-white/60">{moveResults.length} moves played</p>
                       </div>
                       <AccuracyRing percentage={calculateAccuracy()} size="sm" showLabel={false} />
                     </div>
@@ -546,41 +557,41 @@ export default function PracticeSession() {
 
                   {/* Current Stats */}
                   <Card>
-                    <h3 className="font-medium text-[var(--text-primary)] mb-4">Move Breakdown</h3>
+                    <h3 className="font-medium text-white mb-4">Move Breakdown</h3>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-[var(--bg-elevated)] rounded-xl p-3 text-center">
-                        <p className="text-xl font-bold text-[var(--text-primary)]">
+                      <div className="bg-[#1a1a2e]/60 rounded-xl p-3 text-center">
+                        <p className="text-xl font-bold text-white">
                           {moveResults.length}
                         </p>
-                        <p className="text-xs text-[var(--text-muted)]">Total</p>
+                        <p className="text-xs text-white/60">Total</p>
                       </div>
-                      <div className="bg-[var(--bg-elevated)] rounded-xl p-3 text-center">
+                      <div className="bg-[#1a1a2e]/60 rounded-xl p-3 text-center">
                         <p className="text-xl font-bold" style={{ color: CATEGORY_COLORS.book }}>
                           {moveResults.filter((r) => r.category === 'book').length}
                         </p>
-                        <p className="text-xs text-[var(--text-muted)]">Book</p>
+                        <p className="text-xs text-white/60">Book</p>
                       </div>
-                      <div className="bg-[var(--bg-elevated)] rounded-xl p-3 text-center">
+                      <div className="bg-[#1a1a2e]/60 rounded-xl p-3 text-center">
                         <p className="text-xl font-bold" style={{ color: CATEGORY_COLORS.best }}>
                           {moveResults.filter((r) => r.category === 'best' || r.category === 'good').length}
                         </p>
-                        <p className="text-xs text-[var(--text-muted)]">Good</p>
+                        <p className="text-xs text-white/60">Good</p>
                       </div>
-                      <div className="bg-[var(--bg-elevated)] rounded-xl p-3 text-center">
+                      <div className="bg-[#1a1a2e]/60 rounded-xl p-3 text-center">
                         <p className="text-xl font-bold" style={{ color: CATEGORY_COLORS.mistake }}>
                           {moveResults.filter((r) => r.category === 'mistake' || r.category === 'blunder').length}
                         </p>
-                        <p className="text-xs text-[var(--text-muted)]">Errors</p>
+                        <p className="text-xs text-white/60">Errors</p>
                       </div>
                     </div>
                   </Card>
 
                   {/* Move History */}
                   <Card>
-                    <h3 className="font-medium text-[var(--text-primary)] mb-4">Move History</h3>
+                    <h3 className="font-medium text-white mb-4">Move History</h3>
                     <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                       {moveResults.length === 0 ? (
-                        <p className="text-[var(--text-muted)] text-sm italic">
+                        <p className="text-white/60 text-sm italic">
                           Your moves will appear here
                         </p>
                       ) : (
@@ -590,9 +601,9 @@ export default function PracticeSession() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.05 }}
-                            className="flex items-center justify-between p-2 bg-[var(--bg-elevated)] rounded-lg"
+                            className="flex items-center justify-between p-2 bg-[#1a1a2e]/60 rounded-lg"
                           >
-                            <span className="text-[var(--text-primary)] font-mono">{result.move}</span>
+                            <span className="text-white font-mono">{result.move}</span>
                             <span
                               className="text-xs px-2 py-1 rounded-full font-medium"
                               style={{
@@ -625,7 +636,7 @@ export default function PracticeSession() {
             <Spinner size="md" />
           </div>
         ) : (
-          <p className="text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">
+          <p className="text-white/80 whitespace-pre-wrap leading-relaxed">
             {explanation}
           </p>
         )}

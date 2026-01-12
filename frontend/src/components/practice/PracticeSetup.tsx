@@ -10,7 +10,6 @@ import { PageContainer } from '../layout/PageContainer';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Spinner } from '../ui/Spinner';
-import { cn } from '../../utils/cn';
 
 type Step = 'repertoire' | 'mode' | 'opening' | 'ready';
 
@@ -150,31 +149,31 @@ export default function PracticeSetup() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
         <Spinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)]">
+    <div className="min-h-screen bg-[#0a0a0f]">
       <Header title="Practice Setup" backTo="/" />
 
       <PageContainer maxWidth="sm">
         {repertoires.length === 0 ? (
           <Card className="text-center py-12">
             <div className="relative inline-block mb-4">
-              <Swords className="h-16 w-16 text-[var(--text-muted)] mx-auto" />
+              <Swords className="h-16 w-16 text-primary/40 mx-auto" />
               <motion.div
-                className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full"
+                className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"
                 animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
             </div>
-            <h3 className="text-lg font-medium text-[var(--text-secondary)]">
+            <h3 className="font-display text-lg font-bold text-white">
               No repertoires found
             </h3>
-            <p className="text-[var(--text-muted)] mt-1 mb-6 max-w-xs mx-auto">
+            <p className="text-white/60 mt-1 mb-6 max-w-xs mx-auto font-body">
               Create a repertoire first to start practicing your openings
             </p>
             <Link to="/">
@@ -185,17 +184,17 @@ export default function PracticeSetup() {
           <div className="space-y-6">
             {/* Progress Bar */}
             <div className="relative">
-              <div className="h-1 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
+              <div className="h-1 bg-white/10 rounded-full overflow-hidden border border-primary/20">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                  className="h-full bg-gradient-to-r from-primary via-accent to-error glow-primary-strong"
                   initial={{ width: 0 }}
                   animate={{ width: `${getProgress()}%` }}
                   transition={{ duration: 0.3 }}
                 />
               </div>
               <div className="flex justify-between mt-2">
-                <span className="text-xs text-[var(--text-muted)]">{stepInfo[currentStep].title}</span>
-                <span className="text-xs text-[var(--text-muted)]">
+                <span className="font-body text-xs text-primary uppercase tracking-wider">{stepInfo[currentStep].title}</span>
+                <span className="font-mono text-xs text-white/60">
                   Step {getCurrentStepIndex() + 1} of {mode === 'random' ? 3 : 4}
                 </span>
               </div>
@@ -216,10 +215,10 @@ export default function PracticeSetup() {
                 >
                   {/* Step Header */}
                   <div className="mb-6 text-center sm:text-left">
-                    <h2 className="text-xl font-bold text-[var(--text-primary)]">
+                    <h2 className="font-display text-xl font-bold text-electric">
                       {stepInfo[currentStep].title}
                     </h2>
-                    <p className="text-sm text-[var(--text-muted)] mt-1">
+                    <p className="font-body text-sm text-white/60 mt-1">
                       {stepInfo[currentStep].subtitle}
                     </p>
                   </div>
@@ -235,38 +234,36 @@ export default function PracticeSetup() {
                             setSelectedOpening(null);
                           }}
                           whileTap={{ scale: 0.98 }}
-                          className={cn(
-                            'p-4 rounded-xl border-2 text-left transition-all relative overflow-hidden',
+                          className={`p-4 rounded-2xl border-2 text-left transition-all relative overflow-hidden group ${
                             selectedRepertoire === repertoire.id
-                              ? 'border-indigo-500 bg-indigo-500/10'
-                              : 'border-white/10 hover:border-white/20 bg-[var(--bg-elevated)]'
-                          )}
+                              ? 'border-primary bg-primary/10 shadow-glow-primary'
+                              : 'border-white/10 bg-[#1a1a2e]/60 hover:border-primary/50'
+                          }`}
                         >
-                          {/* Color indicator */}
+                          {/* Animated accent bar */}
                           <div
-                            className={cn(
-                              'absolute top-0 left-0 bottom-0 w-1',
+                            className={`absolute top-0 left-0 bottom-0 w-1 transition-all ${
                               repertoire.color === 'white'
-                                ? 'bg-gradient-to-b from-gray-200 to-gray-300'
-                                : 'bg-gradient-to-b from-gray-700 to-gray-800'
-                            )}
+                                ? 'bg-gradient-to-b from-primary to-accent'
+                                : 'bg-gradient-to-b from-accent to-error'
+                            } ${selectedRepertoire === repertoire.id ? 'opacity-100' : 'opacity-50'}`}
                           />
+
                           <div className="flex items-center gap-4 pl-3">
                             <div
-                              className={cn(
-                                'w-12 h-12 rounded-xl flex items-center justify-center text-2xl',
+                              className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold border-2 ${
                                 repertoire.color === 'white'
-                                  ? 'bg-gray-100 text-gray-800'
-                                  : 'bg-gray-800 text-gray-100'
-                              )}
+                                  ? 'bg-white/10 border-primary/30 text-white'
+                                  : 'bg-black/20 border-accent/30 text-white'
+                              } ${selectedRepertoire === repertoire.id ? 'shadow-glow-primary' : ''}`}
                             >
                               {repertoire.color === 'white' ? '♔' : '♚'}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-[var(--text-primary)] truncate">
+                              <p className="font-display font-semibold text-white truncate group-hover:text-electric transition-colors">
                                 {repertoire.name}
                               </p>
-                              <p className="text-sm text-[var(--text-muted)]">
+                              <p className="font-mono text-sm text-primary">
                                 {repertoire.openings?.length || 0} opening{(repertoire.openings?.length || 0) !== 1 ? 's' : ''}
                               </p>
                             </div>
@@ -274,9 +271,9 @@ export default function PracticeSetup() {
                               <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center"
+                                className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-glow-primary"
                               >
-                                <ChevronRight className="h-4 w-4 text-white" />
+                                <ChevronRight className="w-5 h-5 text-black" />
                               </motion.div>
                             )}
                           </div>
@@ -287,22 +284,23 @@ export default function PracticeSetup() {
 
                   {/* Mode Selection */}
                   {currentStep === 'mode' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <motion.button
                         onClick={() => setMode('random')}
                         whileTap={{ scale: 0.98 }}
-                        className={cn(
-                          'p-6 rounded-xl border-2 text-center transition-all',
+                        className={`p-6 rounded-2xl border-2 text-center transition-all cursor-pointer group ${
                           mode === 'random'
-                            ? 'border-indigo-500 bg-indigo-500/10'
-                            : 'border-white/10 hover:border-white/20 bg-[var(--bg-elevated)]'
-                        )}
+                            ? 'border-primary bg-primary/10 shadow-glow-primary'
+                            : 'border-white/10 bg-[#1a1a2e]/60 hover:border-primary/50'
+                        }`}
                       >
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/20">
-                          <Shuffle className="h-7 w-7 text-white" />
+                        <div className={`w-14 h-14 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 ${
+                          mode === 'random' ? 'shadow-glow-primary animate-glow' : 'shadow-lg'
+                        }`}>
+                          <Shuffle className="w-7 h-7 text-white" />
                         </div>
-                        <p className="font-semibold text-[var(--text-primary)] mb-1">Random</p>
-                        <p className="text-sm text-[var(--text-muted)]">
+                        <p className="font-display font-semibold text-white mb-1 group-hover:text-electric transition-colors">Random</p>
+                        <p className="font-body text-sm text-white/60">
                           Practice random openings from your repertoire
                         </p>
                       </motion.button>
@@ -310,18 +308,19 @@ export default function PracticeSetup() {
                       <motion.button
                         onClick={() => setMode('specific')}
                         whileTap={{ scale: 0.98 }}
-                        className={cn(
-                          'p-6 rounded-xl border-2 text-center transition-all',
+                        className={`p-6 rounded-2xl border-2 text-center transition-all cursor-pointer group ${
                           mode === 'specific'
-                            ? 'border-purple-500 bg-purple-500/10'
-                            : 'border-white/10 hover:border-white/20 bg-[var(--bg-elevated)]'
-                        )}
+                            ? 'border-accent bg-accent/10 shadow-glow-purple'
+                            : 'border-white/10 bg-[#1a1a2e]/60 hover:border-accent/50'
+                        }`}
                       >
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/20">
-                          <Target className="h-7 w-7 text-white" />
+                        <div className={`w-14 h-14 rounded-3xl bg-gradient-to-br from-accent to-error flex items-center justify-center mx-auto mb-4 ${
+                          mode === 'specific' ? 'shadow-glow-purple animate-glow' : 'shadow-lg'
+                        }`}>
+                          <Target className="w-7 h-7 text-white" />
                         </div>
-                        <p className="font-semibold text-[var(--text-primary)] mb-1">Specific</p>
-                        <p className="text-sm text-[var(--text-muted)]">
+                        <p className="font-display font-semibold text-white mb-1 group-hover:text-electric-purple transition-colors">Specific</p>
+                        <p className="font-body text-sm text-white/60">
                           Focus on mastering one opening line
                         </p>
                       </motion.button>
@@ -332,23 +331,22 @@ export default function PracticeSetup() {
                   {currentStep === 'opening' && selectedRepertoireData && (
                     <div>
                       {selectedRepertoireData.openings && selectedRepertoireData.openings.length > 0 ? (
-                        <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                        <div className="flex flex-col gap-2 max-h-64 overflow-y-auto pr-2">
                           {selectedRepertoireData.openings.map((opening) => (
                             <motion.button
                               key={opening.id}
                               onClick={() => setSelectedOpening(opening.id)}
                               whileTap={{ scale: 0.98 }}
-                              className={cn(
-                                'w-full p-4 rounded-xl border-2 text-left transition-all',
+                              className={`w-full p-4 rounded-2xl border-2 text-left transition-all cursor-pointer group ${
                                 selectedOpening === opening.id
-                                  ? 'border-purple-500 bg-purple-500/10'
-                                  : 'border-white/10 hover:border-white/20 bg-[var(--bg-elevated)]'
-                              )}
+                                  ? 'border-accent bg-accent/10 shadow-glow-purple'
+                                  : 'border-white/10 bg-[#1a1a2e]/60 hover:border-accent/50'
+                              }`}
                             >
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <p className="font-medium text-[var(--text-primary)]">{opening.name}</p>
-                                  <p className="text-sm text-[var(--text-muted)]">
+                                  <p className="font-display font-medium text-white group-hover:text-electric-purple transition-colors">{opening.name}</p>
+                                  <p className="font-mono text-sm text-white/60">
                                     {opening.eco || 'Custom opening'}
                                   </p>
                                 </div>
@@ -356,9 +354,9 @@ export default function PracticeSetup() {
                                   <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center"
+                                    className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shadow-glow-purple"
                                   >
-                                    <ChevronRight className="h-4 w-4 text-white" />
+                                    <ChevronRight className="w-5 h-5 text-white" />
                                   </motion.div>
                                 )}
                               </div>
@@ -367,9 +365,9 @@ export default function PracticeSetup() {
                         </div>
                       ) : (
                         <div className="text-center py-8">
-                          <Target className="h-12 w-12 text-[var(--text-muted)] mx-auto mb-3" />
-                          <p className="text-[var(--text-muted)]">No openings in this repertoire yet</p>
-                          <p className="text-sm text-[var(--text-muted)] mt-1">
+                          <Target className="w-12 h-12 text-white/40 mx-auto mb-3" />
+                          <p className="text-white/60 font-body">No openings in this repertoire yet</p>
+                          <p className="text-sm text-white/40 mt-1 font-body">
                             Add openings to your repertoire first
                           </p>
                         </div>
@@ -385,44 +383,44 @@ export default function PracticeSetup() {
                         animate={{ scale: 1, opacity: 1 }}
                         className="relative inline-block mb-6"
                       >
-                        <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl shadow-indigo-500/30">
+                        <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary via-accent to-error flex items-center justify-center shadow-xl shadow-primary/30 animate-circuit-pulse">
                           <Swords className="h-12 w-12 text-white" />
                         </div>
                         <motion.div
-                          className="absolute inset-0 bg-indigo-500/30 blur-2xl rounded-full -z-10"
+                          className="absolute inset-0 bg-primary/30 blur-2xl rounded-full -z-10"
                           animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
                           transition={{ duration: 2, repeat: Infinity }}
                         />
                       </motion.div>
 
-                      <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">
+                      <h3 className="font-display text-lg font-bold text-electric mb-4">
                         You're all set!
                       </h3>
 
-                      <div className="bg-[var(--bg-elevated)] rounded-xl p-4 mb-6 text-left">
+                      <div className="bg-[#1a1a2e]/60 backdrop-blur-xl rounded-xl p-4 mb-6 text-left border border-primary/20">
                         <div className="space-y-3">
                           <div className="flex justify-between items-center">
-                            <span className="text-[var(--text-muted)]">Repertoire</span>
-                            <span className="font-medium text-[var(--text-primary)]">
+                            <span className="font-body text-white/60">Repertoire</span>
+                            <span className="font-display font-medium text-white">
                               {selectedRepertoireData.name}
                             </span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-[var(--text-muted)]">Color</span>
-                            <span className="font-medium text-[var(--text-primary)]">
+                            <span className="font-body text-white/60">Color</span>
+                            <span className="font-display font-medium text-white">
                               {selectedRepertoireData.color === 'white' ? '♔ White' : '♚ Black'}
                             </span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-[var(--text-muted)]">Mode</span>
-                            <span className="font-medium text-[var(--text-primary)]">
+                            <span className="font-body text-white/60">Mode</span>
+                            <span className="font-display font-medium text-white">
                               {mode === 'random' ? 'Random openings' : 'Specific opening'}
                             </span>
                           </div>
                           {mode === 'specific' && selectedOpening && (
                             <div className="flex justify-between items-center">
-                              <span className="text-[var(--text-muted)]">Opening</span>
-                              <span className="font-medium text-[var(--text-primary)]">
+                              <span className="font-body text-white/60">Opening</span>
+                              <span className="font-display font-medium text-white">
                                 {selectedRepertoireData.openings?.find(o => o.id === selectedOpening)?.name}
                               </span>
                             </div>
@@ -434,7 +432,7 @@ export default function PracticeSetup() {
                         onClick={handleStartPractice}
                         isLoading={isStarting}
                         size="lg"
-                        className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-xl shadow-indigo-500/20"
+                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/80 hover:to-accent/80 shadow-xl shadow-primary/20 glow-primary-strong"
                         leftIcon={<Play className="h-5 w-5" />}
                       >
                         Start Practice

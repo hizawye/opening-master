@@ -11,7 +11,6 @@ import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
 import { Input } from './ui/Input';
-import { cn } from '../utils/cn';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -67,7 +66,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-[#0a0a0f]">
       <Header showLogo />
 
       <PageContainer>
@@ -75,28 +74,28 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 sm:p-8"
+          className="mb-8 rounded-3xl bg-gradient-to-br from-primary to-accent p-6 shadow-2xl glow-primary"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Crown className="h-6 w-6 text-white" />
+            <div className="p-2 bg-white/20 rounded-2xl">
+              <Crown className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-indigo-200 text-sm">Welcome back,</p>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">
+              <p className="text-white/80 text-sm font-display">Welcome back,</p>
+              <h1 className="text-xl font-bold text-white font-display">
                 {user?.username || user?.email?.split('@')[0] || 'Player'}
               </h1>
             </div>
           </div>
 
-          <p className="text-indigo-100 mb-6 max-w-md">
+          <p className="text-white/90 mb-6 max-w-md font-body">
             Master your opening repertoire with focused practice sessions and AI-powered analysis.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button
               onClick={() => navigate('/practice')}
-              className="bg-white text-indigo-600 hover:bg-indigo-50"
+              variant="primary"
               size="lg"
             >
               Start Practice
@@ -104,8 +103,7 @@ export default function Dashboard() {
             <Button
               variant="secondary"
               onClick={() => setShowCreateModal(true)}
-              leftIcon={<Plus className="h-5 w-5" />}
-              className="border border-white/20"
+              leftIcon={<Plus style={{ width: '1.25rem', height: '1.25rem' }} />}
             >
               New Repertoire
             </Button>
@@ -118,32 +116,32 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-3 gap-3 mb-8"
+            className="grid grid-cols-3 gap-4 max-w-3xl mb-8"
           >
-            <Card padding="sm" className="text-center">
-              <p className="text-2xl sm:text-3xl font-bold text-slate-50">{repertoires.length}</p>
-              <p className="text-xs sm:text-sm text-slate-500">Repertoires</p>
+            <Card padding="sm" className="text-center bg-[#1a1a2e]/60 backdrop-blur-xl border border-primary/10">
+              <p className="text-3xl font-bold text-white font-display">{repertoires.length}</p>
+              <p className="text-xs uppercase tracking-wider text-white/60 font-display">Repertoires</p>
             </Card>
-            <Card padding="sm" className="text-center">
-              <p className="text-2xl sm:text-3xl font-bold text-indigo-400">
+            <Card padding="sm" className="text-center bg-[#1a1a2e]/60 backdrop-blur-xl border border-primary/10">
+              <p className="text-3xl font-bold text-white font-display">
                 {repertoires.reduce((acc, r) => acc + (r.openings?.length || 0), 0)}
               </p>
-              <p className="text-xs sm:text-sm text-slate-500">Openings</p>
+              <p className="text-xs uppercase tracking-wider text-white/60 font-display">Openings</p>
             </Card>
-            <Card padding="sm" className="text-center">
-              <p className="text-2xl sm:text-3xl font-bold text-purple-400">
+            <Card padding="sm" className="text-center bg-[#1a1a2e]/60 backdrop-blur-xl border border-primary/10">
+              <p className="text-3xl font-bold text-accent font-display">
                 {repertoires.filter(r => r.color === 'white').length}W / {repertoires.filter(r => r.color === 'black').length}B
               </p>
-              <p className="text-xs sm:text-sm text-slate-500">White/Black</p>
+              <p className="text-xs uppercase tracking-wider text-white/60 font-display">White/Black</p>
             </Card>
           </motion.div>
         )}
 
         {/* Repertoires Section */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-slate-50 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-indigo-400" />
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-2xl font-bold text-electric flex items-center gap-3">
+              <BookOpen className="w-6 h-6 text-primary" />
               Your Repertoires
             </h2>
             {repertoires.length > 0 && (
@@ -151,7 +149,7 @@ export default function Dashboard() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowCreateModal(true)}
-                leftIcon={<Plus className="h-4 w-4" />}
+                leftIcon={<Plus style={{ width: '1rem', height: '1rem' }} />}
               >
                 Add
               </Button>
@@ -159,100 +157,99 @@ export default function Dashboard() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(3)].map((_, i) => (
-                <Card key={i} className="h-40 animate-pulse" />
+                <Card key={i} className="h-40 animate-skeleton" />
               ))}
             </div>
           ) : repertoires.length === 0 ? (
             <Card className="text-center py-12">
-              <BookOpen className="h-16 w-16 text-slate-600 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-300 mb-2">No repertoires yet</h3>
-              <p className="text-slate-500 mb-6 max-w-sm mx-auto">
+              <BookOpen className="w-16 h-16 text-primary/40 mx-auto mb-4" />
+              <h3 className="font-display text-xl font-bold text-white mb-2">No repertoires yet</h3>
+              <p className="text-white/60 mb-6 font-body">
                 Create your first repertoire to start building your opening knowledge.
               </p>
-              <Button onClick={() => setShowCreateModal(true)} leftIcon={<Plus className="h-4 w-4" />}>
+              <Button onClick={() => setShowCreateModal(true)} leftIcon={<Plus style={{ width: '1rem', height: '1rem' }} />}>
                 Create Your First Repertoire
               </Button>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {repertoires.map((repertoire) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {repertoires.map((repertoire, index) => (
                 <Card
                   key={repertoire.id}
                   variant="interactive"
-                  className="group"
+                  className="relative overflow-hidden group"
                   onClick={() => navigate(`/repertoire/${repertoire.id}`)}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  {/* Color indicator */}
+                  {/* Animated color accent bar */}
                   <div
-                    className={cn(
-                      'absolute top-0 left-0 right-0 h-1 rounded-t-xl',
-                      repertoire.color === 'white' ? 'bg-slate-300' : 'bg-slate-700'
-                    )}
+                    className={`absolute top-0 left-0 right-0 h-1 ${
+                      repertoire.color === 'white'
+                        ? 'bg-gradient-to-r from-primary to-accent'
+                        : 'bg-gradient-to-r from-accent to-error'
+                    } animate-shimmer`}
                   />
 
-                  <div className="pt-2">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={cn(
-                            'w-10 h-10 rounded-lg flex items-center justify-center text-xl',
-                            repertoire.color === 'white' ? 'bg-slate-300 text-slate-800' : 'bg-slate-700 text-slate-100'
-                          )}
-                        >
-                          {repertoire.color === 'white' ? '♔' : '♚'}
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-medium text-slate-50 group-hover:text-indigo-400 transition-colors">
-                            {repertoire.name}
-                          </h3>
-                          <p className="text-sm text-slate-500">
-                            {repertoire.openings?.length || 0} opening{(repertoire.openings?.length || 0) !== 1 ? 's' : ''}
-                          </p>
-                        </div>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold border-2 ${
+                          repertoire.color === 'white'
+                            ? 'bg-white/10 border-primary/30 text-white shadow-glow-primary'
+                            : 'bg-black/20 border-accent/30 text-white shadow-glow-purple'
+                        }`}
+                      >
+                        {repertoire.color === 'white' ? '♔' : '♚'}
                       </div>
-                      <button
+                      <div>
+                        <h3 className="font-display text-lg font-bold text-white group-hover:text-electric transition-colors">
+                          {repertoire.name}
+                        </h3>
+                        <p className="font-mono text-xs text-primary">
+                          {repertoire.openings?.length || 0} opening{(repertoire.openings?.length || 0) !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteRepertoire(repertoire.id);
+                      }}
+                      className="btn btn-ghost btn-sm btn-circle opacity-0 group-hover:opacity-100 transition-opacity text-error hover:bg-error/20"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-primary/10">
+                    <span className="font-body text-sm text-white/60 uppercase tracking-wider">
+                      {repertoire.color === 'white' ? 'Playing White' : 'Playing Black'}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteRepertoire(repertoire.id);
+                          navigate(`/repertoire/${repertoire.id}`);
                         }}
-                        className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100"
+                        leftIcon={<Edit3 style={{ width: '0.75rem', height: '0.75rem' }} />}
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 border-t border-slate-700">
-                      <span className="text-xs text-slate-500">
-                        {repertoire.color === 'white' ? 'Playing White' : 'Playing Black'}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/repertoire/${repertoire.id}`);
-                          }}
-                          leftIcon={<Edit3 className="h-3 w-3" />}
-                          className="text-xs"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate('/practice');
-                          }}
-                          leftIcon={<Play className="h-3 w-3" />}
-                          className="text-xs"
-                        >
-                          Practice
-                        </Button>
-                      </div>
+                        Edit
+                      </Button>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate('/practice');
+                        }}
+                        leftIcon={<Play style={{ width: '0.75rem', height: '0.75rem' }} />}
+                      >
+                        Practice
+                      </Button>
                     </div>
                   </div>
                 </Card>
@@ -269,7 +266,7 @@ export default function Dashboard() {
         title="Create New Repertoire"
       >
         <form onSubmit={handleCreateRepertoire}>
-          <div className="space-y-4">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <Input
               label="Name"
               value={newRepertoireName}
@@ -279,31 +276,47 @@ export default function Dashboard() {
             />
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: 'rgba(255, 255, 255, 0.8)',
+                marginBottom: '0.5rem',
+              }}>
                 Color
               </label>
-              <div className="flex gap-4">
+              <div style={{ display: 'flex', gap: '1rem' }}>
                 <button
                   type="button"
                   onClick={() => setNewRepertoireColor('white')}
-                  className={cn(
-                    'flex-1 py-3 rounded-lg border-2 transition-all font-medium',
-                    newRepertoireColor === 'white'
-                      ? 'border-indigo-500 bg-slate-700 text-slate-50'
-                      : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
-                  )}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    borderRadius: '0.75rem',
+                    border: `2px solid ${newRepertoireColor === 'white' ? '#00f0ff' : 'rgba(255, 255, 255, 0.1)'}`,
+                    backgroundColor: newRepertoireColor === 'white' ? 'rgba(26, 26, 46, 0.8)' : '#1a1a2e',
+                    color: newRepertoireColor === 'white' ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
                 >
                   ♔ White
                 </button>
                 <button
                   type="button"
                   onClick={() => setNewRepertoireColor('black')}
-                  className={cn(
-                    'flex-1 py-3 rounded-lg border-2 transition-all font-medium',
-                    newRepertoireColor === 'black'
-                      ? 'border-indigo-500 bg-slate-700 text-slate-50'
-                      : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
-                  )}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    borderRadius: '0.75rem',
+                    border: `2px solid ${newRepertoireColor === 'black' ? '#00f0ff' : 'rgba(255, 255, 255, 0.1)'}`,
+                    backgroundColor: newRepertoireColor === 'black' ? 'rgba(26, 26, 46, 0.8)' : '#1a1a2e',
+                    color: newRepertoireColor === 'black' ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
                 >
                   ♚ Black
                 </button>
@@ -311,16 +324,16 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6">
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
             <Button
               type="button"
-              variant="secondary"
+              variant="neutral"
               onClick={() => setShowCreateModal(false)}
-              className="flex-1"
+              className="u-flex-1"
             >
               Cancel
             </Button>
-            <Button type="submit" isLoading={isCreating} className="flex-1">
+            <Button type="submit" isLoading={isCreating} className="u-flex-1">
               Create
             </Button>
           </div>

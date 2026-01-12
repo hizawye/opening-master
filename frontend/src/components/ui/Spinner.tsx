@@ -1,41 +1,33 @@
-import { cn } from '../../utils/cn';
-
 export interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
+  color?: 'cyan' | 'white' | 'dark';
 }
 
-const sizes = {
-  sm: 'h-4 w-4 border-2',
-  md: 'h-8 w-8 border-2',
-  lg: 'h-12 w-12 border-[3px]',
-};
+export function Spinner({ size = 'md', className, color = 'cyan' }: SpinnerProps) {
+  const sizeClass = {
+    sm: 'loading-sm',
+    md: 'loading-md',
+    lg: 'loading-lg',
+    xl: 'loading-lg', // DaisyUI doesn't have xl
+  }[size];
 
-export function Spinner({ size = 'md', className }: SpinnerProps) {
-  return (
-    <div
-      className={cn(
-        'rounded-full',
-        'border-indigo-500/30',
-        'border-t-indigo-500',
-        'animate-spin',
-        sizes[size],
-        className
-      )}
-    />
-  );
+  const colorClass = {
+    cyan: 'text-primary',
+    white: 'text-base-content',
+    dark: 'text-neutral',
+  }[color];
+
+  return <span className={`loading loading-spinner ${sizeClass} ${colorClass} ${className || ''}`} />;
 }
 
 // Full page loading state
 export function PageLoader() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
+    <div className="fixed inset-0 flex items-center justify-center bg-base-100 z-50">
       <div className="flex flex-col items-center gap-4">
-        <div className="relative">
-          <Spinner size="lg" />
-          <div className="absolute inset-0 rounded-full animate-ping bg-indigo-500/20" />
-        </div>
-        <p className="text-[var(--text-secondary)] text-sm animate-pulse">Loading...</p>
+        <Spinner size="xl" />
+        <p className="font-display text-base-content/60 uppercase tracking-wider text-sm">Loading...</p>
       </div>
     </div>
   );
