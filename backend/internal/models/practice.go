@@ -17,6 +17,7 @@ type PracticeSession struct {
 	EndedAt      *time.Time         `bson:"ended_at,omitempty" json:"ended_at,omitempty"`
 	Moves        []PracticeMove     `bson:"moves" json:"moves"`
 	Stats        PracticeStats      `bson:"stats" json:"stats"`
+	Config       PracticeConfig     `bson:"config" json:"config"`
 }
 
 type PracticeMove struct {
@@ -42,10 +43,17 @@ type PracticeStats struct {
 	AccuracyPercentage float64 `bson:"accuracy_percentage" json:"accuracy_percentage"`
 }
 
+type PracticeConfig struct {
+	MaxMoves        int    `bson:"max_moves" json:"max_moves"`
+	Difficulty      string `bson:"difficulty" json:"difficulty"`
+	AllowVariations bool   `bson:"allow_variations" json:"allow_variations"`
+}
+
 type StartPracticeRequest struct {
-	RepertoireID string `json:"repertoire_id" binding:"required"`
-	OpeningID    string `json:"opening_id"` // optional, empty = random
-	Mode         string `json:"mode" binding:"required,oneof=specific random"`
+	RepertoireID string          `json:"repertoire_id" binding:"required"`
+	OpeningID    string          `json:"opening_id"` // optional, empty = random
+	Mode         string          `json:"mode" binding:"required,oneof=specific random"`
+	Config       *PracticeConfig `json:"config"` // optional, defaults applied server-side
 }
 
 type SubmitMoveRequest struct {

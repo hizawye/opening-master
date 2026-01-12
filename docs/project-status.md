@@ -85,10 +85,23 @@
 - ✅ User authentication (email/password)
 - ✅ Repertoire management (create, edit, delete)
 - ✅ Opening editor with Lichess book moves
-- ✅ Practice mode with AI opponent
-- ✅ Move categorization (Book, Best, Good, Inaccuracy, Mistake, Blunder)
+- ✅ Practice mode with repertoire-only drilling (v0.7.0)
+- ✅ Move categorization: Correct (repertoire) / Mistake
+- ✅ Take-back on wrong moves with expected move hints
 - ✅ Session statistics and summary
-- ✅ LLM-powered move explanations
+- ✅ LLM-powered move explanations (for repertoire building)
+
+## Recent Changes (v0.7.0 - Simplified Practice Mode)
+- Removed Stockfish from practice mode (too slow for drilling)
+- Practice now drills only repertoire moves (no engine play)
+- Simplified move categories to: 'repertoire' | 'mistake'
+- Take-back on wrong moves: shows expected moves, allows retry
+- Added session configuration: length, difficulty, variations toggle
+- New RepertoireNavigator utility for O(1) FEN-based position lookup
+- New useRepertoireNavigator and useEvaluationCache hooks
+- AI opponent plays ONLY from user's repertoire
+- Stockfish remains available for repertoire building only
+- Removed ~200 lines of engine complexity from PracticeSession
 
 ## Next Steps (Post-MVP)
 1. Add Stockfish WASM files to public/stockfish/

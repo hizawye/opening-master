@@ -1,4 +1,5 @@
-export type MoveCategory = 'book' | 'best' | 'good' | 'inaccuracy' | 'mistake' | 'blunder';
+// Simplified categories for repertoire-only drilling
+export type MoveCategory = 'repertoire' | 'mistake';
 
 export interface PracticeSession {
   id: string;
@@ -11,6 +12,7 @@ export interface PracticeSession {
   ended_at?: string;
   moves: PracticeMove[];
   stats: PracticeStats;
+  config: PracticeConfig;
 }
 
 export interface PracticeMove {
@@ -20,19 +22,13 @@ export interface PracticeMove {
   user_move: string;
   expected_move?: string;
   category: MoveCategory;
-  eval_before: number;
-  eval_after: number;
-  centipawn_loss: number;
 }
 
 export interface PracticeStats {
   total_moves: number;
-  book_moves: number;
-  best_moves: number;
-  good_moves: number;
-  inaccuracies: number;
+  correct_moves?: number;  // Frontend field
+  book_moves?: number;     // Backend field (maps to correct_moves)
   mistakes: number;
-  blunders: number;
   accuracy_percentage: number;
 }
 
@@ -40,6 +36,13 @@ export interface StartPracticeRequest {
   repertoire_id: string;
   opening_id?: string;
   mode: 'specific' | 'random';
+  config?: PracticeConfig;
+}
+
+export interface PracticeConfig {
+  max_moves: number;           // 0 = unlimited
+  difficulty: 'strict' | 'flexible';
+  allow_variations: boolean;
 }
 
 export interface SubmitMoveRequest {
@@ -48,7 +51,4 @@ export interface SubmitMoveRequest {
   user_move: string;
   expected_move?: string;
   category: MoveCategory;
-  eval_before: number;
-  eval_after: number;
-  centipawn_loss: number;
 }

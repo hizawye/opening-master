@@ -66,6 +66,11 @@ App
 - `useStockfish()` - Engine analysis
 - `useLichessExplorer()` - Opening book data
 - `usePractice()` - Practice session state machine
+- `useRepertoireNavigator()` - React wrapper for RepertoireNavigator with lifecycle management
+- `useEvaluationCache()` - Caching layer for Stockfish evaluations
+
+### Utilities
+- `RepertoireNavigator` - O(1) FEN-based repertoire traversal with position lookup Map
 
 ## Backend Architecture
 

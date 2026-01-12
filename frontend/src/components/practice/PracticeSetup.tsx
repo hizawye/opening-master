@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { repertoireApi } from '../../api/repertoire';
 import { practiceApi } from '../../api/practice';
 import type { Repertoire } from '../../types/repertoire';
+import type { PracticeConfig } from '../../types/practice';
 import { Play, Shuffle, Target, ChevronLeft, ChevronRight, Swords, BookOpen } from 'lucide-react';
 import { Header } from '../layout/Header';
 import { PageContainer } from '../layout/PageContainer';
@@ -11,13 +12,14 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Spinner } from '../ui/Spinner';
 
-type Step = 'repertoire' | 'mode' | 'opening' | 'ready';
+type Step = 'repertoire' | 'mode' | 'config' | 'opening' | 'ready';
 
-const stepOrder: Step[] = ['repertoire', 'mode', 'opening', 'ready'];
+const stepOrder: Step[] = ['repertoire', 'mode', 'config', 'opening', 'ready'];
 
 const stepInfo = {
   repertoire: { title: 'Choose Repertoire', subtitle: 'Select which opening lines to practice' },
   mode: { title: 'Practice Mode', subtitle: 'How do you want to train?' },
+  config: { title: 'Session Settings', subtitle: 'Customize your practice experience' },
   opening: { title: 'Select Opening', subtitle: 'Focus on a specific line' },
   ready: { title: 'Ready to Practice', subtitle: 'Review your setup and start' },
 };
@@ -44,6 +46,11 @@ export default function PracticeSetup() {
   const [selectedRepertoire, setSelectedRepertoire] = useState<string | null>(null);
   const [selectedOpening, setSelectedOpening] = useState<string | null>(null);
   const [mode, setMode] = useState<'random' | 'specific'>('random');
+  const [config, setConfig] = useState<PracticeConfig>({
+    max_moves: 30,
+    difficulty: 'flexible',
+    allow_variations: false,
+  });
   const [isStarting, setIsStarting] = useState(false);
   const [currentStep, setCurrentStep] = useState<Step>('repertoire');
   const [direction, setDirection] = useState(0);
@@ -75,6 +82,7 @@ export default function PracticeSetup() {
         repertoire_id: selectedRepertoire,
         opening_id: mode === 'specific' ? selectedOpening || undefined : undefined,
         mode,
+        config, // Pass config
       });
       navigate(`/practice/${session.id}`);
     } catch (error) {
@@ -90,6 +98,9 @@ export default function PracticeSetup() {
   const getNextStep = (): Step | null => {
     const idx = getCurrentStepIndex();
     if (currentStep === 'mode' && mode === 'random') {
+      return 'config'; // Go to config after mode
+    }
+    if (currentStep === 'config' && mode === 'random') {
       return 'ready'; // Skip opening selection for random mode
     }
     if (idx < stepOrder.length - 1) {
@@ -101,7 +112,10 @@ export default function PracticeSetup() {
   const getPrevStep = (): Step | null => {
     const idx = getCurrentStepIndex();
     if (currentStep === 'ready' && mode === 'random') {
-      return 'mode'; // Skip back to mode if we came from random
+      return 'config'; // Skip back to config if we came from random
+    }
+    if (currentStep === 'config') {
+      return 'mode'; // Always go back to mode from config
     }
     if (idx > 0) {
       return stepOrder[idx - 1];
@@ -130,6 +144,8 @@ export default function PracticeSetup() {
       case 'repertoire':
         return !!selectedRepertoire;
       case 'mode':
+        return true;
+      case 'config':
         return true;
       case 'opening':
         return mode === 'random' || !!selectedOpening || (selectedRepertoireData?.openings?.length || 0) === 0;
@@ -324,6 +340,75 @@ export default function PracticeSetup() {
                           Focus on mastering one opening line
                         </p>
                       </motion.button>
+                    </div>
+                  )}
+
+                  {/* Configuration Step */}
+                  {currentStep === 'config' && (
+                    <div className="space-y-6">
+                      {/* Session Length */}
+                      <div>
+                        <label className="block text-sm font-medium text-white/80 mb-2">
+                          Session Length
+                        </label>
+                        <select
+                          value={config.max_moves}
+                          onChange={(e) => setConfig({ ...config, max_moves: Number(e.target.value) })}
+                          className="w-full p-3 rounded-xl bg-[#1a1a2e]/60 border border-white/10 text-white focus:border-primary focus:outline-none"
+                        >
+                          <option value={20}>Short (20 moves)</option>
+                          <option value={30}>Standard (30 moves)</option>
+                          <option value={50}>Long (50 moves)</option>
+                          <option value={0}>Until out of repertoire</option>
+                        </select>
+                      </div>
+
+                      {/* Difficulty */}
+                      <div>
+                        <label className="block text-sm font-medium text-white/80 mb-2">
+                          Difficulty
+                        </label>
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            onClick={() => setConfig({ ...config, difficulty: 'flexible' })}
+                            className={`p-4 rounded-xl border-2 transition-all ${
+                              config.difficulty === 'flexible'
+                                ? 'border-primary bg-primary/10 shadow-glow-primary'
+                                : 'border-white/10 bg-[#1a1a2e]/60 hover:border-primary/50'
+                            }`}
+                          >
+                            <p className="font-medium text-white">Flexible</p>
+                            <p className="text-sm text-white/60">Continue past repertoire</p>
+                          </button>
+                          <button
+                            onClick={() => setConfig({ ...config, difficulty: 'strict' })}
+                            className={`p-4 rounded-xl border-2 transition-all ${
+                              config.difficulty === 'strict'
+                                ? 'border-accent bg-accent/10 shadow-glow-purple'
+                                : 'border-white/10 bg-[#1a1a2e]/60 hover:border-accent/50'
+                            }`}
+                          >
+                            <p className="font-medium text-white">Strict</p>
+                            <p className="text-sm text-white/60">End when out of book</p>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Variations */}
+                      <div>
+                        <label className="flex items-center gap-3 p-4 rounded-xl bg-[#1a1a2e]/60 border border-white/10 cursor-pointer hover:border-primary/50 transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={config.allow_variations}
+                            onChange={(e) => setConfig({ ...config, allow_variations: e.target.checked })}
+                            className="w-5 h-5 rounded border-white/20 bg-[#1a1a2e] text-primary focus:ring-primary"
+                          />
+                          <div>
+                            <p className="font-medium text-white">Allow Variations</p>
+                            <p className="text-sm text-white/60">AI plays sidelines, not just main line</p>
+                          </div>
+                        </label>
+                      </div>
                     </div>
                   )}
 

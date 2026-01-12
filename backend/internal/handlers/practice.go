@@ -50,11 +50,22 @@ func (h *PracticeHandler) Start(c *gin.Context) {
 		return
 	}
 
+	// Apply defaults to config if not provided
+	config := req.Config
+	if config == nil {
+		config = &models.PracticeConfig{
+			MaxMoves:        30,
+			Difficulty:      "flexible",
+			AllowVariations: false,
+		}
+	}
+
 	session := &models.PracticeSession{
 		UserID:       userID,
 		RepertoireID: repertoireID,
 		Mode:         req.Mode,
 		Color:        repertoire.Color,
+		Config:       *config,
 	}
 
 	if req.OpeningID != "" {
@@ -213,6 +224,11 @@ func calculateStats(moves []models.PracticeMove) models.PracticeStats {
 
 	for _, move := range moves {
 		switch move.Category {
+		case "repertoire":
+			stats.BookMoves++ // Correct moves (using BookMoves field for backwards compatibility)
+		case "mistake":
+			stats.Mistakes++
+		// Legacy categories for backwards compatibility
 		case "book":
 			stats.BookMoves++
 		case "best":
@@ -221,16 +237,14 @@ func calculateStats(moves []models.PracticeMove) models.PracticeStats {
 			stats.GoodMoves++
 		case "inaccuracy":
 			stats.Inaccuracies++
-		case "mistake":
-			stats.Mistakes++
 		case "blunder":
 			stats.Blunders++
 		}
 	}
 
 	if stats.TotalMoves > 0 {
-		goodMoves := stats.BookMoves + stats.BestMoves + stats.GoodMoves
-		stats.AccuracyPercentage = float64(goodMoves) / float64(stats.TotalMoves) * 100
+		correctMoves := stats.BookMoves + stats.BestMoves + stats.GoodMoves
+		stats.AccuracyPercentage = float64(correctMoves) / float64(stats.TotalMoves) * 100
 	}
 
 	return stats

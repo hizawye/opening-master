@@ -5,18 +5,15 @@ import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { practiceApi } from '../../api/practice';
 import { repertoireApi } from '../../api/repertoire';
-import { teachingApi } from '../../api/teaching';
-import { useLichessExplorer } from '../../hooks/useLichessExplorer';
-import { useStockfish } from '../../hooks/useStockfish';
-import { categorizeMove, calculateCentipawnLoss, CATEGORY_COLORS, CATEGORY_LABELS } from '../../utils/moveEvaluation';
+import { RepertoireNavigator } from '../../utils/repertoireNavigator';
+import { CATEGORY_COLORS, CATEGORY_LABELS } from '../../utils/moveEvaluation';
 import type { PracticeSession as PracticeSessionType, MoveCategory } from '../../types/practice';
 import type { Repertoire } from '../../types/repertoire';
-import { Trophy, RotateCcw, Sparkles, ChevronUp, X } from 'lucide-react';
+import { Trophy, Sparkles, ChevronUp, X } from 'lucide-react';
 import { Header } from '../layout/Header';
 import { PageContainer } from '../layout/PageContainer';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Modal } from '../ui/Modal';
 import { Spinner } from '../ui/Spinner';
 import { AccuracyRing } from '../ui/AccuracyRing';
 import { MoveFeedback } from './MoveFeedback';
@@ -24,7 +21,11 @@ import { MoveFeedback } from './MoveFeedback';
 interface MoveResult {
   move: string;
   category: MoveCategory;
-  explanation?: string;
+}
+
+interface WrongMoveState {
+  played: string;
+  expected: string[];
 }
 
 const containerVariants = {
@@ -47,21 +48,16 @@ export default function PracticeSession() {
   const navigate = useNavigate();
   const [session, setSession] = useState<PracticeSessionType | null>(null);
   const [repertoire, setRepertoire] = useState<Repertoire | null>(null);
+  const [navigator, setNavigator] = useState<RepertoireNavigator | null>(null);
   const [game] = useState(new Chess());
   const [fen, setFen] = useState(game.fen());
   const [isLoading, setIsLoading] = useState(true);
   const [moveResults, setMoveResults] = useState<MoveResult[]>([]);
   const [lastMoveResult, setLastMoveResult] = useState<MoveResult | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [wrongMove, setWrongMove] = useState<WrongMoveState | null>(null);
   const [isSessionComplete, setIsSessionComplete] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [explanation, setExplanation] = useState('');
-  const [loadingExplanation, setLoadingExplanation] = useState(false);
   const [showMobileStats, setShowMobileStats] = useState(false);
-
-  const { isBookMove } = useLichessExplorer(fen);
-  const { isReady: stockfishReady, getBestMove, getEvaluation } = useStockfish();
 
   useEffect(() => {
     if (sessionId) {
@@ -77,9 +73,18 @@ export default function PracticeSession() {
       const repertoireData = await repertoireApi.get(sessionData.repertoire_id);
       setRepertoire(repertoireData);
 
+      // Initialize navigator with config
+      const nav = new RepertoireNavigator(
+        repertoireData,
+        sessionData.color,
+        sessionData.config?.allow_variations || false
+      );
+      setNavigator(nav);
+
       // If playing black, AI makes first move
       if (sessionData.color === 'black') {
-        await makeAiMove();
+        // Small delay to ensure state is set
+        setTimeout(() => makeAiMoveWithNav(nav), 300);
       }
     } catch (error) {
       console.error('Failed to load session:', error);
@@ -89,70 +94,58 @@ export default function PracticeSession() {
     }
   };
 
-  const makeAiMove = useCallback(async () => {
-    if (!stockfishReady) return;
-
+  // Separate function for initial AI move when navigator isn't in state yet
+  const makeAiMoveWithNav = useCallback(async (nav: RepertoireNavigator) => {
     setAiThinking(true);
     try {
-      // Get best move from Stockfish or repertoire
-      const bestMove = await getBestMove(game.fen());
-      if (bestMove) {
-        const move = game.move(bestMove);
-        if (move) {
+      const currentFen = game.fen();
+      const move = nav.getOpponentMove(currentFen);
+
+      if (move) {
+        const moveResult = game.move({
+          from: move.substring(0, 2),
+          to: move.substring(2, 4),
+          promotion: move.length === 5 ? move[4] : undefined,
+        });
+
+        if (moveResult) {
           setFen(game.fen());
         }
       }
-    } catch (error) {
-      console.error('AI move failed:', error);
     } finally {
       setAiThinking(false);
     }
-  }, [stockfishReady, getBestMove, game]);
+  }, [game]);
 
-  const processMove = async (_sourceSquare: string, _targetSquare: string, moveSan: string, fenBefore: string, fenAfter: string) => {
+  const makeAiMove = useCallback(async () => {
+    if (!navigator) return;
+
+    setAiThinking(true);
     try {
-      const evalBefore = stockfishReady ? await getEvaluation(fenBefore) : 0;
-      const evalAfter = stockfishReady ? await getEvaluation(fenAfter) : 0;
+      const currentFen = game.fen();
+      const move = navigator.getOpponentMove(currentFen);
 
-      // Check if it's a book move
-      const bookMove = isBookMove(moveSan);
+      if (move) {
+        const moveResult = game.move({
+          from: move.substring(0, 2),
+          to: move.substring(2, 4),
+          promotion: move.length === 5 ? move[4] : undefined,
+        });
 
-      // Calculate centipawn loss and categorize
-      const cpLoss = calculateCentipawnLoss(evalBefore, evalAfter, session?.color || 'white');
-      const category = categorizeMove(cpLoss, bookMove);
-
-      // Submit move to backend
-      await practiceApi.submitMove(sessionId!, {
-        fen_before: fenBefore,
-        fen_after: fenAfter,
-        user_move: moveSan,
-        category,
-        eval_before: evalBefore,
-        eval_after: evalAfter,
-        centipawn_loss: cpLoss,
-      });
-
-      const result: MoveResult = { move: moveSan, category };
-      setMoveResults((prev) => [...prev, result]);
-      setLastMoveResult(result);
-
-      // Check if session should end (15 moves or game over)
-      const moveCount = game.history().length;
-      if (moveCount >= 30 || game.isGameOver()) {
-        await endSession();
+        if (moveResult) {
+          setFen(game.fen());
+        }
       } else {
-        // AI responds
-        setTimeout(() => makeAiMove(), 500);
+        // Out of repertoire - end session
+        await endSession();
       }
-    } catch (error) {
-      console.error('Move evaluation failed:', error);
     } finally {
-      setIsAnalyzing(false);
+      setAiThinking(false);
     }
-  };
+  }, [navigator, game]);
 
   const handleMove = (sourceSquare: string, targetSquare: string): boolean => {
-    if (isAnalyzing || aiThinking || isSessionComplete) return false;
+    if (aiThinking || isSessionComplete || wrongMove) return false;
 
     // Check if it's the player's turn
     const isWhiteTurn = game.turn() === 'w';
@@ -173,18 +166,97 @@ export default function PracticeSession() {
         return false;
       }
 
-      const fenAfter = game.fen();
-      setFen(fenAfter);
-      setIsAnalyzing(true);
+      // Check if move matches repertoire
+      const isCorrect = navigator?.isRepertoireMove(fenBefore, move.san);
 
-      // Process move asynchronously
-      processMove(sourceSquare, targetSquare, move.san, fenBefore, fenAfter);
+      if (isCorrect) {
+        // Correct move - continue
+        setFen(game.fen());
+        setWrongMove(null);
 
-      return true;
+        const result: MoveResult = { move: move.san, category: 'repertoire' };
+        setMoveResults(prev => [...prev, result]);
+        setLastMoveResult(result);
+
+        // Record correct move
+        practiceApi.submitMove(sessionId!, {
+          fen_before: fenBefore,
+          fen_after: game.fen(),
+          user_move: move.san,
+          category: 'repertoire',
+        });
+
+        // Check if session should end
+        if (shouldEndSession()) {
+          endSession();
+        } else {
+          // AI responds after short delay
+          setTimeout(() => makeAiMove(), 300);
+        }
+        return true;
+      } else {
+        // Wrong move - undo and show feedback
+        game.undo();
+
+        const expectedMoves = navigator?.getExpectedMoves(fenBefore) || [];
+        setWrongMove({
+          played: move.san,
+          expected: expectedMoves.map(m => m.move),
+        });
+
+        // Record mistake for stats
+        const result: MoveResult = { move: move.san, category: 'mistake' };
+        setMoveResults(prev => [...prev, result]);
+        setLastMoveResult(result);
+
+        // Submit mistake to backend
+        practiceApi.submitMove(sessionId!, {
+          fen_before: fenBefore,
+          fen_after: fenBefore, // Same position since we undid
+          user_move: move.san,
+          expected_move: expectedMoves.find(m => m.is_main_line)?.move,
+          category: 'mistake',
+        });
+
+        return false;
+      }
     } catch {
       return false;
     }
   };
+
+  const handleTryAgain = () => {
+    setWrongMove(null);
+    setLastMoveResult(null);
+  };
+
+  const shouldEndSession = useCallback((): boolean => {
+    const maxMoves = session?.config?.max_moves || 30;
+    const moveCount = game.history().length;
+
+    // Check move limit (0 = unlimited)
+    if (maxMoves > 0 && moveCount >= maxMoves) {
+      return true;
+    }
+
+    // Check game over
+    if (game.isGameOver()) {
+      return true;
+    }
+
+    // Check if out of repertoire for AI's next move
+    const aiMove = navigator?.getOpponentMove(game.fen());
+    if (!aiMove) {
+      // In strict mode, end if out of repertoire
+      if (session?.config?.difficulty === 'strict') {
+        return true;
+      }
+      // In flexible mode, also end since we have no moves to make
+      return true;
+    }
+
+    return false;
+  }, [session, game, navigator]);
 
   const endSession = async () => {
     try {
@@ -196,37 +268,11 @@ export default function PracticeSession() {
     }
   };
 
-  const handleGetExplanation = async () => {
-    if (!lastMoveResult || lastMoveResult.category === 'book' || lastMoveResult.category === 'best') {
-      return;
-    }
-
-    setLoadingExplanation(true);
-    setShowExplanation(true);
-
-    try {
-      const bestMove = await getBestMove(fen);
-      const analysis = await teachingApi.analyzeMistake({
-        fen,
-        played_move: lastMoveResult.move,
-        best_move: bestMove || lastMoveResult.move,
-        centipawn_loss: 0,
-      });
-      setExplanation(analysis);
-    } catch (error) {
-      setExplanation('Unable to generate explanation at this time.');
-    } finally {
-      setLoadingExplanation(false);
-    }
-  };
-
   // Calculate accuracy percentage for the ring
   const calculateAccuracy = () => {
     if (moveResults.length === 0) return 0;
-    const goodMoves = moveResults.filter(
-      (r) => r.category === 'book' || r.category === 'best' || r.category === 'good'
-    ).length;
-    return Math.round((goodMoves / moveResults.length) * 100);
+    const correctMoves = moveResults.filter(r => r.category === 'repertoire').length;
+    return Math.round((correctMoves / moveResults.length) * 100);
   };
 
   if (isLoading) {
@@ -295,7 +341,7 @@ export default function PracticeSession() {
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8"
+                  className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8"
                 >
                   <motion.div variants={itemVariants}>
                     <Card padding="sm" className="bg-[#1a1a2e]/60">
@@ -307,31 +353,23 @@ export default function PracticeSession() {
                   </motion.div>
                   <motion.div variants={itemVariants}>
                     <Card padding="sm" className="bg-[#1a1a2e]/60">
-                      <p className="text-3xl font-bold" style={{ color: CATEGORY_COLORS.book }}>
-                        {session?.stats.book_moves || 0}
+                      <p className="text-3xl font-bold" style={{ color: CATEGORY_COLORS.repertoire }}>
+                        {session?.stats.correct_moves || session?.stats.book_moves || 0}
                       </p>
-                      <p className="text-sm text-white/60">Book Moves</p>
-                    </Card>
-                  </motion.div>
-                  <motion.div variants={itemVariants}>
-                    <Card padding="sm" className="bg-[#1a1a2e]/60">
-                      <p className="text-3xl font-bold" style={{ color: CATEGORY_COLORS.best }}>
-                        {(session?.stats.best_moves || 0) + (session?.stats.good_moves || 0)}
-                      </p>
-                      <p className="text-sm text-white/60">Good Moves</p>
+                      <p className="text-sm text-white/60">Correct</p>
                     </Card>
                   </motion.div>
                   <motion.div variants={itemVariants}>
                     <Card padding="sm" className="bg-[#1a1a2e]/60">
                       <p className="text-3xl font-bold" style={{ color: CATEGORY_COLORS.mistake }}>
-                        {(session?.stats.mistakes || 0) + (session?.stats.blunders || 0)}
+                        {session?.stats.mistakes || 0}
                       </p>
                       <p className="text-sm text-white/60">Mistakes</p>
                     </Card>
                   </motion.div>
                 </motion.div>
 
-                {/* Accuracy Ring - Using new component */}
+                {/* Accuracy Ring */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -399,7 +437,7 @@ export default function PracticeSession() {
                     <div style={{ width: '1px', height: '1.5rem', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.6)' }}>Accuracy</span>
-                      <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#00f0ff' }}>{calculateAccuracy()}%</span>
+                      <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#a855f7' }}>{calculateAccuracy()}%</span>
                     </div>
                   </div>
                   <ChevronUp style={{
@@ -420,29 +458,23 @@ export default function PracticeSession() {
                       exit={{ opacity: 0, height: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="mt-2 p-4 rounded-xl bg-[#1a1a2e]/80/95 backdrop-blur-xl border border-white/10 shadow-lg">
-                        <div className="grid grid-cols-4 gap-2 mb-3">
+                      <div className="mt-2 p-4 rounded-xl bg-[#1a1a2e]/95 backdrop-blur-xl border border-white/10 shadow-lg">
+                        <div className="grid grid-cols-3 gap-2 mb-3">
                           <div className="text-center p-2 rounded-lg bg-[#1a1a2e]/60">
                             <p className="text-lg font-bold text-white">{moveResults.length}</p>
                             <p className="text-[10px] text-white/60">Total</p>
                           </div>
                           <div className="text-center p-2 rounded-lg bg-[#1a1a2e]/60">
-                            <p className="text-lg font-bold" style={{ color: CATEGORY_COLORS.book }}>
-                              {moveResults.filter(r => r.category === 'book').length}
+                            <p className="text-lg font-bold" style={{ color: CATEGORY_COLORS.repertoire }}>
+                              {moveResults.filter(r => r.category === 'repertoire').length}
                             </p>
-                            <p className="text-[10px] text-white/60">Book</p>
-                          </div>
-                          <div className="text-center p-2 rounded-lg bg-[#1a1a2e]/60">
-                            <p className="text-lg font-bold" style={{ color: CATEGORY_COLORS.best }}>
-                              {moveResults.filter(r => r.category === 'best' || r.category === 'good').length}
-                            </p>
-                            <p className="text-[10px] text-white/60">Good</p>
+                            <p className="text-[10px] text-white/60">Correct</p>
                           </div>
                           <div className="text-center p-2 rounded-lg bg-[#1a1a2e]/60">
                             <p className="text-lg font-bold" style={{ color: CATEGORY_COLORS.mistake }}>
-                              {moveResults.filter(r => r.category === 'mistake' || r.category === 'blunder').length}
+                              {moveResults.filter(r => r.category === 'mistake').length}
                             </p>
-                            <p className="text-[10px] text-white/60">Errors</p>
+                            <p className="text-[10px] text-white/60">Mistakes</p>
                           </div>
                         </div>
                         <Button variant="secondary" size="sm" className="w-full" onClick={() => setShowMobileStats(false)}>
@@ -478,7 +510,7 @@ export default function PracticeSession() {
 
                         {/* Loading Overlay */}
                         <AnimatePresence>
-                          {(isAnalyzing || aiThinking) && (
+                          {aiThinking && (
                             <motion.div
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
@@ -488,7 +520,7 @@ export default function PracticeSession() {
                               <div className="bg-[#1a1a2e]/80 px-4 py-3 rounded-xl flex items-center gap-3 shadow-xl">
                                 <Spinner size="sm" />
                                 <span className="text-white font-medium">
-                                  {aiThinking ? 'AI thinking...' : 'Analyzing...'}
+                                  AI thinking...
                                 </span>
                               </div>
                             </motion.div>
@@ -497,18 +529,22 @@ export default function PracticeSession() {
                       </div>
                     </div>
 
-                    {/* Last Move Feedback - Using new component */}
+                    {/* Move Feedback */}
                     <div className="px-2 sm:px-6 pb-4">
-                      {lastMoveResult ? (
+                      {wrongMove ? (
+                        <MoveFeedback
+                          move={wrongMove.played}
+                          category="mistake"
+                          isVisible={true}
+                          expectedMoves={wrongMove.expected}
+                          onTryAgain={handleTryAgain}
+                          compact={false}
+                        />
+                      ) : lastMoveResult ? (
                         <MoveFeedback
                           move={lastMoveResult.move}
                           category={lastMoveResult.category}
                           isVisible={true}
-                          onRequestExplanation={
-                            lastMoveResult.category !== 'book' && lastMoveResult.category !== 'best'
-                              ? handleGetExplanation
-                              : undefined
-                          }
                           compact={false}
                         />
                       ) : (
@@ -520,17 +556,6 @@ export default function PracticeSession() {
 
                     {/* Mobile Action Bar */}
                     <div className="lg:hidden flex items-center justify-center gap-3 px-4 pb-4 border-t border-white/5 pt-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          // Undo functionality could be added here
-                        }}
-                        leftIcon={<RotateCcw className="h-4 w-4" />}
-                        disabled
-                      >
-                        Undo
-                      </Button>
                       <Button
                         variant="danger"
                         size="sm"
@@ -558,7 +583,7 @@ export default function PracticeSession() {
                   {/* Current Stats */}
                   <Card>
                     <h3 className="font-medium text-white mb-4">Move Breakdown</h3>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <div className="bg-[#1a1a2e]/60 rounded-xl p-3 text-center">
                         <p className="text-xl font-bold text-white">
                           {moveResults.length}
@@ -566,22 +591,16 @@ export default function PracticeSession() {
                         <p className="text-xs text-white/60">Total</p>
                       </div>
                       <div className="bg-[#1a1a2e]/60 rounded-xl p-3 text-center">
-                        <p className="text-xl font-bold" style={{ color: CATEGORY_COLORS.book }}>
-                          {moveResults.filter((r) => r.category === 'book').length}
+                        <p className="text-xl font-bold" style={{ color: CATEGORY_COLORS.repertoire }}>
+                          {moveResults.filter((r) => r.category === 'repertoire').length}
                         </p>
-                        <p className="text-xs text-white/60">Book</p>
-                      </div>
-                      <div className="bg-[#1a1a2e]/60 rounded-xl p-3 text-center">
-                        <p className="text-xl font-bold" style={{ color: CATEGORY_COLORS.best }}>
-                          {moveResults.filter((r) => r.category === 'best' || r.category === 'good').length}
-                        </p>
-                        <p className="text-xs text-white/60">Good</p>
+                        <p className="text-xs text-white/60">Correct</p>
                       </div>
                       <div className="bg-[#1a1a2e]/60 rounded-xl p-3 text-center">
                         <p className="text-xl font-bold" style={{ color: CATEGORY_COLORS.mistake }}>
-                          {moveResults.filter((r) => r.category === 'mistake' || r.category === 'blunder').length}
+                          {moveResults.filter((r) => r.category === 'mistake').length}
                         </p>
-                        <p className="text-xs text-white/60">Errors</p>
+                        <p className="text-xs text-white/60">Mistakes</p>
                       </div>
                     </div>
                   </Card>
@@ -624,28 +643,6 @@ export default function PracticeSession() {
           )}
         </AnimatePresence>
       </PageContainer>
-
-      {/* Explanation Modal */}
-      <Modal
-        isOpen={showExplanation}
-        onClose={() => setShowExplanation(false)}
-        title="Move Analysis"
-      >
-        {loadingExplanation ? (
-          <div className="flex items-center justify-center py-8">
-            <Spinner size="md" />
-          </div>
-        ) : (
-          <p className="text-white/80 whitespace-pre-wrap leading-relaxed">
-            {explanation}
-          </p>
-        )}
-        <div className="mt-6">
-          <Button variant="secondary" className="w-full" onClick={() => setShowExplanation(false)}>
-            Close
-          </Button>
-        </div>
-      </Modal>
     </div>
   );
 }

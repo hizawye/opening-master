@@ -1,12 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, AlertTriangle, BookOpen, Star, Zap } from 'lucide-react';
+import { CheckCircle, XCircle, Target } from 'lucide-react';
 import type { MoveCategory } from '../../types/practice';
 
 export interface MoveFeedbackProps {
   move: string;
   category: MoveCategory;
   isVisible: boolean;
-  onRequestExplanation?: () => void;
+  expectedMoves?: string[];
+  onTryAgain?: () => void;
   compact?: boolean;
 }
 
@@ -16,41 +17,17 @@ const categoryConfig: Record<MoveCategory, {
   color: string;
   bgGradient: string;
 }> = {
-  book: {
-    icon: BookOpen,
-    label: 'Book Move',
-    color: '#00f0ff',
-    bgGradient: 'linear-gradient(to right, rgba(0, 240, 255, 0.1), rgba(191, 0, 255, 0.1))',
-  },
-  best: {
-    icon: Star,
-    label: 'Best Move',
-    color: '#39ff14',
-    bgGradient: 'linear-gradient(to right, rgba(57, 255, 20, 0.1), rgba(57, 255, 20, 0.05))',
-  },
-  good: {
-    icon: CheckCircle,
-    label: 'Good Move',
-    color: '#39ff14',
-    bgGradient: 'linear-gradient(to right, rgba(57, 255, 20, 0.08), rgba(57, 255, 20, 0.03))',
-  },
-  inaccuracy: {
-    icon: AlertTriangle,
-    label: 'Inaccuracy',
-    color: '#ffaa00',
-    bgGradient: 'linear-gradient(to right, rgba(255, 170, 0, 0.1), rgba(255, 170, 0, 0.05))',
+  repertoire: {
+    icon: Target,
+    label: 'Correct',
+    color: '#a855f7',
+    bgGradient: 'linear-gradient(to right, rgba(168, 85, 247, 0.15), rgba(168, 85, 247, 0.05))',
   },
   mistake: {
     icon: XCircle,
-    label: 'Mistake',
-    color: '#fe6e00',
-    bgGradient: 'linear-gradient(to right, rgba(254, 110, 0, 0.1), rgba(254, 110, 0, 0.05))',
-  },
-  blunder: {
-    icon: Zap,
-    label: 'Blunder',
-    color: '#ff006e',
-    bgGradient: 'linear-gradient(to right, rgba(255, 0, 110, 0.1), rgba(255, 0, 110, 0.05))',
+    label: 'Try Again',
+    color: '#ef4444',
+    bgGradient: 'linear-gradient(to right, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05))',
   },
 };
 
@@ -58,12 +35,13 @@ export function MoveFeedback({
   move,
   category,
   isVisible,
-  onRequestExplanation,
+  expectedMoves,
+  onTryAgain,
   compact = false,
 }: MoveFeedbackProps) {
   const config = categoryConfig[category];
   const Icon = config.icon;
-  const isPositive = category === 'book' || category === 'best' || category === 'good';
+  const isCorrect = category === 'repertoire';
 
   return (
     <AnimatePresence>
@@ -100,7 +78,7 @@ export function MoveFeedback({
                 borderRadius: '1rem',
                 width: compact ? '2.5rem' : '3rem',
                 height: compact ? '2.5rem' : '3rem',
-                backgroundColor: isPositive ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.2)',
+                backgroundColor: isCorrect ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.2)',
                 color: config.color,
               }}
             >
@@ -136,32 +114,57 @@ export function MoveFeedback({
               </motion.p>
             </div>
 
-            {/* Explain button for non-optimal moves */}
-            {!isPositive && onRequestExplanation && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.25 }}
-                onClick={onRequestExplanation}
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  borderRadius: '0.75rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
+            {/* Correct move indicator */}
+            {isCorrect && !compact && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', delay: 0.2 }}
               >
-                Why?
-              </motion.button>
+                <CheckCircle style={{ width: '1.5rem', height: '1.5rem', color: config.color }} />
+              </motion.div>
             )}
           </div>
 
-          {/* Decorative elements for positive moves */}
-          {isPositive && !compact && (
+          {/* Wrong move - show expected moves and try again */}
+          {!isCorrect && expectedMoves && expectedMoves.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              transition={{ delay: 0.25 }}
+              style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}
+            >
+              <p style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '0.5rem' }}>
+                Expected: <span style={{ fontFamily: 'Share Tech Mono, monospace', color: '#a855f7', fontWeight: 600 }}>
+                  {expectedMoves.join(' or ')}
+                </span>
+              </p>
+              {onTryAgain && (
+                <motion.button
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.35 }}
+                  onClick={onTryAgain}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '0.75rem',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                    color: '#a855f7',
+                    border: '1px solid rgba(168, 85, 247, 0.3)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  Try Again
+                </motion.button>
+              )}
+            </motion.div>
+          )}
+
+          {/* Decorative sparkle for correct moves */}
+          {isCorrect && !compact && (
             <motion.div
               style={{
                 position: 'absolute',
@@ -174,37 +177,32 @@ export function MoveFeedback({
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              {/* Sparkle effects */}
-              {category === 'best' && (
-                <>
-                  <motion.div
-                    style={{
-                      position: 'absolute',
-                      top: '0.5rem',
-                      right: '1rem',
-                      width: '4px',
-                      height: '4px',
-                      backgroundColor: '#fbbf24',
-                      borderRadius: '50%',
-                    }}
-                    animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  />
-                  <motion.div
-                    style={{
-                      position: 'absolute',
-                      top: '1rem',
-                      right: '2rem',
-                      width: '2px',
-                      height: '2px',
-                      backgroundColor: '#fcd34d',
-                      borderRadius: '50%',
-                    }}
-                    animate={{ scale: [1, 2, 1], opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                  />
-                </>
-              )}
+              <motion.div
+                style={{
+                  position: 'absolute',
+                  top: '0.5rem',
+                  right: '1rem',
+                  width: '4px',
+                  height: '4px',
+                  backgroundColor: '#a855f7',
+                  borderRadius: '50%',
+                }}
+                animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+              <motion.div
+                style={{
+                  position: 'absolute',
+                  top: '1rem',
+                  right: '2rem',
+                  width: '2px',
+                  height: '2px',
+                  backgroundColor: '#c084fc',
+                  borderRadius: '50%',
+                }}
+                animate={{ scale: [1, 2, 1], opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+              />
             </motion.div>
           )}
         </motion.div>
@@ -238,7 +236,7 @@ export function MoveFeedbackPill({
       }}
     >
       <span>{count}</span>
-      <span style={{ opacity: 0.75 }}>{config.label.split(' ')[0]}</span>
+      <span style={{ opacity: 0.75 }}>{config.label}</span>
     </div>
   );
 }

@@ -21,21 +21,26 @@ export function useStockfish() {
 
   useEffect(() => {
     // Create a web worker for Stockfish
+    // Pass the origin from main thread since blob workers don't have access to location.origin
+    const origin = window.location.origin;
+
     const workerCode = `
       let stockfish = null;
+      const ORIGIN = '${origin}';
 
       self.onmessage = function(e) {
         const { type, payload } = e.data;
 
         if (type === 'INIT') {
           try {
-            stockfish = new Worker('/stockfish/stockfish.js');
+            const stockfishPath = ORIGIN + '/stockfish/stockfish.js';
+            stockfish = new Worker(stockfishPath);
             stockfish.onmessage = function(event) {
               self.postMessage({ type: 'ENGINE_MESSAGE', payload: event.data });
             };
             stockfish.postMessage('uci');
           } catch (error) {
-            self.postMessage({ type: 'ERROR', payload: error.message });
+            self.postMessage({ type: 'ERROR', payload: error.message || String(error) });
           }
         } else if (stockfish) {
           stockfish.postMessage(payload);
@@ -125,28 +130,48 @@ export function useStockfish() {
     });
   }, [state.isReady]);
 
-  const getEvaluation = useCallback(async (fen: string, depth = 15): Promise<number> => {
+  const getEvaluation = useCallback((fen: string, depth = 15): Promise<number> => {
     return new Promise((resolve) => {
       if (!workerRef.current || !state.isReady) {
         resolve(0);
         return;
       }
 
+      let latestEvaluation: number | null = null;
+      let timeoutId: number;
+
       const handleMessage = (e: MessageEvent) => {
         if (e.data.type === 'ENGINE_MESSAGE') {
           const message = e.data.payload;
+
+          // Capture evaluation from info lines (fixes closure bug)
+          if (message.startsWith('info depth')) {
+            const evaluation = parseInfoLine(message);
+            if (evaluation) {
+              latestEvaluation = evaluation.score;
+            }
+          }
+
+          // Resolve when bestmove arrives with captured evaluation
           if (message.startsWith('bestmove')) {
+            clearTimeout(timeoutId);
             workerRef.current?.removeEventListener('message', handleMessage);
-            resolve(state.evaluation?.score || 0);
+            resolve(latestEvaluation || 0);
           }
         }
       };
+
+      // Add timeout to prevent hanging
+      timeoutId = window.setTimeout(() => {
+        workerRef.current?.removeEventListener('message', handleMessage);
+        resolve(latestEvaluation || 0);
+      }, 10000); // 10 second timeout
 
       workerRef.current.addEventListener('message', handleMessage);
       workerRef.current.postMessage({ type: 'CMD', payload: `position fen ${fen}` });
       workerRef.current.postMessage({ type: 'CMD', payload: `go depth ${depth}` });
     });
-  }, [state.isReady, state.evaluation]);
+  }, [state.isReady]); // Remove state.evaluation dependency
 
   return {
     ...state,

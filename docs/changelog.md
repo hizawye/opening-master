@@ -2,6 +2,62 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-01-12
+
+### Changed
+- **Simplified Practice Mode - Repertoire-Only Drilling**: Complete redesign of practice mode for fast, focused repertoire memorization
+  - Removed Stockfish integration from practice (too slow for drilling)
+  - Practice now drills ONLY repertoire moves - no engine play
+  - Simplified move categories from 7 to 2: `repertoire` (correct) and `mistake`
+  - AI opponent plays exclusively from user's repertoire (no Lichess/Stockfish fallback)
+  - Removed engine depth configuration from PracticeSetup
+  - Stockfish remains available for repertoire building only (separate feature)
+
+### Added
+- **Practice Session Configuration**: New settings step in practice wizard
+  - Session length options: Short (20 moves), Standard (30), Long (50), Unlimited
+  - Difficulty modes: 'strict' (exact moves only) or 'flexible' (accept alternatives)
+  - Allow Variations toggle: train on variations or main lines only
+  - `PracticeConfig` type added to frontend and backend
+- **RepertoireNavigator Utility**: Efficient repertoire traversal system
+  - O(1) FEN-based position lookup via pre-built Map
+  - `getOpponentMove()` - find repertoire response for any position
+  - `isRepertoireMove()` - validate user moves against repertoire
+  - `getExpectedMoves()` - get all valid continuations for a position
+  - Handles transpositions naturally via FEN matching
+  - Supports variation training with random selection
+- **useRepertoireNavigator Hook**: React wrapper with lifecycle management
+- **useEvaluationCache Hook**: Caching layer for Stockfish evaluations
+  - Prevents race conditions in async evaluation
+  - `prefetchEvaluations()` for warming cache
+- **Take-Back on Wrong Moves**: When user plays incorrect move:
+  - Move is undone automatically
+  - Shows expected repertoire move(s)
+  - "Try Again" button to retry
+  - Instant feedback without waiting for engine evaluation
+- Updated `MoveFeedback` component with take-back UI
+- `WrongMoveState` tracking in PracticeSession
+- Session settings step added to practice setup wizard flow
+
+### Removed
+- `ENGINE_DEPTHS` constant from practice.ts
+- `engine_depth` from `PracticeConfig` interface
+- `useStockfish` hook from PracticeSession
+- `useLichessExplorer` hook from PracticeSession
+- `categorizeMove()` and `calculateCentipawnLoss()` functions from moveEvaluation.ts
+- Engine Strength selector UI from PracticeSetup
+- `isAnalyzing` state (no more engine analysis in practice)
+- Complex 3-tier fallback logic (repertoire → Lichess → Stockfish)
+- ~200 lines of engine complexity from PracticeSession.tsx
+- `eval_before`, `eval_after`, `centipawn_loss` fields from PracticeMove type
+
+### Technical
+- Frontend TypeScript builds clean with no errors
+- Backend Go builds clean with no errors
+- Backwards compatibility maintained in backend stats calculation
+- PracticeSession.tsx reduced from 781 lines to 648 lines
+- New files: `useEvaluationCache.ts`, `useRepertoireNavigator.ts`, `repertoireNavigator.ts`
+
 ## [0.6.0] - 2026-01-12
 
 ### Changed
